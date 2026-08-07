@@ -20,4 +20,5 @@ OpenMAIC 项目根目录的 `AGENTS.md`，本仓库不再单独复制规则文�
 
 - [x] Phase 0：工程骨架 + 自建类型模块（dsl）
 - [x] Phase 1：核心纯 TS 移植（播放引擎 / 动作引擎 / 打字机 / 互动循环 / Pinia store）
-- [ ] 后续阶段（mock 课堂数据、页面框架、slide/quiz/interactive 渲染、语音同步、互动闭环）
+- [x] Phase 2：mock 课堂数据 + 接口层（课堂页可加载数据）
+- [ ] 后续阶段（页面框架、slide/quiz/interactive 渲染、语音同步、互动闭环）

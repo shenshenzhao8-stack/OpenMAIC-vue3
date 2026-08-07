@@ -31,3 +31,6 @@
 - [PHASE-1.md](./PHASE-1.md)：核心纯 TS 移植（播放引擎 / 动作引擎 / 打字机 / 互动循环 / Pinia store / 语音与 TTS 基础）
 
 - [REFERENCE-PHASE-1.md](./REFERENCE-PHASE-1.md)：Phase 1 工作参考手册（逐文件/逐方法业务讲解）
+
+- [PHASE-2.md](./PHASE-2.md)：mock 课堂数据 + 接口层
+- [REFERENCE-PHASE-2.md](./REFERENCE-PHASE-2.md)：Phase 2 工作参考手册（逐文件/逐方法业务讲解）
