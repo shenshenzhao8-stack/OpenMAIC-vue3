@@ -1,0 +1,8 @@
+# 依赖与构建产物
+node_modules
+dist
+coverage
+
+# 本地环境文件
+*.local
+.DS_Store

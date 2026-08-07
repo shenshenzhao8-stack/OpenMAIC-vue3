@@ -1,0 +1,27 @@
+{
+  "name": "openmaic-vue3",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OpenMAIC 的 Vue 3 复刻版（裁剪范围：slide/quiz/interactive 三种场景 + speech/spotlight 两种教学动作）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "pinia": "^3.0.4",
+    "vue": "^3.5.41",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "~5.9.0",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10",
+    "vue-tsc": "^3.3.9"
+  }
+}
