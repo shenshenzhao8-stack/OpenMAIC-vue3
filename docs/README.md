@@ -34,3 +34,10 @@
 
 - [PHASE-2.md](./PHASE-2.md)：mock 课堂数据 + 接口层
 - [REFERENCE-PHASE-2.md](./REFERENCE-PHASE-2.md)：Phase 2 工作参考手册（逐文件/逐方法业务讲解）
+
+## 提交约定（AGENTS.md 规则五）
+
+每完成一个 Phase，**不自动执行 git add / commit / push**；改动保留在工作区，
+由用户人工仔细审核后自行提交。除非用户在对话中明确要求提交/推送。
+
+- [DEVELOPMENT-PLAN.md](./DEVELOPMENT-PLAN.md)：开发计划总览（范围/决策/阶段路线/文件对照/进度）
