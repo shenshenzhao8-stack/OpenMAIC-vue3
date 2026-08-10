@@ -1,43 +1,34 @@
 <!--
-  文件头：课堂播放页
-  对应原项目：app/classroom/[id]/page.tsx（课堂加载逻辑的简化版）
-  功能（Phase 2）：
-    1. 进入页面后从接口层加载课堂数据（getClassroom）；
-    2. 写入 stage store（stage + scenes + currentSceneId）；
-    3. 展示课程信息与场景列表（当前场景的类型/标题/动作清单）。
-  说明：真正的场景渲染（幻灯片/测验/交互）在 Phase 3-6 实现，
-  本页目前用「数据展示占位」证明课堂数据链路已通。
+  文件头：课堂播放页（课堂外壳）
+  对应原项目：app/classroom/[id]/page.tsx（加载课堂）+ components/stage.tsx（舞台根）+ PlaybackChromeRoot（引擎接线）
+  功能（Phase 3）：
+    1. 加载 mock 课堂数据并写入 stage store；
+    2. 课堂外壳：顶栏（课程信息 + 播放控制）、侧边栏（场景列表）、主区（场景渲染分发）；
+    3. 播放引擎接线：usePlaybackEngine（播放/暂停/翻页/字幕）。
+  说明：场景渲染当前为占位（Phase 4/5/6 替换）；互动（学生提问）在 Phase 8 接入。
 -->
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStageStore } from '@/stores/stage'
 import { getClassroom } from '@/api/client'
+import { getFirstSceneId } from '@/utils/playback-navigation'
+import { usePlaybackEngine } from '@/composables/usePlaybackEngine'
+import HeaderControls from '@/components/stage/HeaderControls.vue'
+import SceneSidebar from '@/components/stage/SceneSidebar.vue'
+import SceneProvider from '@/components/stage/SceneProvider.vue'
+import SceneRenderer from '@/components/stage/SceneRenderer.vue'
 
 const route = useRoute()
 const stageStore = useStageStore()
 
+// 播放引擎接线（引擎实例唯一，控制按钮与字幕共用）
+const { mode, lectureSpeech, play, pause, resume, stop, nextScene, prevScene } =
+  usePlaybackEngine()
+
 // 加载状态
 const loading = ref(true)
-// 加载失败信息
 const error = ref<string | null>(null)
-
-// 当前场景（由 store 派生：currentSceneId → scenes）
-const currentScene = computed(() => stageStore.currentScene)
-
-/** 场景类型的中文标签（展示用） */
-const sceneTypeLabel: Record<string, string> = {
-  slide: '幻灯片',
-  quiz: '测验',
-  interactive: '交互实验',
-}
-
-/** 把一条动作转成可读描述（展示用；Phase 3 起由渲染器真正执行） */
-function actionText(action: { type: string; text?: string; elementId?: string }): string {
-  if (action.type === 'speech') return `讲解：${action.text ?? ''}`
-  if (action.type === 'spotlight') return `聚光 → 元素 ${action.elementId ?? ''}`
-  return action.type
-}
 
 onMounted(async () => {
   try {
@@ -46,7 +37,7 @@ onMounted(async () => {
     stageStore.setStage(stage)
     stageStore.setScenes(scenes)
     // 默认进入第一页
-    stageStore.setCurrentSceneId(scenes[0]?.id ?? null)
+    stageStore.setCurrentSceneId(getFirstSceneId(scenes))
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   } finally {
@@ -56,91 +47,95 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="page">
+  <main class="classroom">
     <!-- 加载中 -->
-    <p v-if="loading">课堂加载中…</p>
+    <p v-if="loading" class="status">课堂加载中…</p>
     <!-- 错误态 -->
-    <p v-else-if="error" class="error">{{ error }}</p>
+    <p v-else-if="error" class="status error">{{ error }}</p>
 
     <template v-else>
-      <!-- 课程信息 -->
-      <header class="course-header">
-        <h1>{{ stageStore.stage?.name }}</h1>
-        <p>{{ stageStore.stage?.description }}</p>
+      <!-- 顶栏：课程信息 + 播放控制 -->
+      <header class="topbar">
+        <div class="course">
+          <h1>{{ stageStore.stage?.name }}</h1>
+          <p>{{ stageStore.stage?.description }}</p>
+        </div>
+        <HeaderControls
+          :mode="mode"
+          :on-play="play"
+          :on-pause="pause"
+          :on-resume="resume"
+          :on-stop="stop"
+          :on-next="nextScene"
+          :on-prev="prevScene"
+        />
       </header>
 
-      <!-- 场景列表（Phase 3 起替换为真正的播放器外壳） -->
-      <section class="scene-list">
-        <h2>场景列表</h2>
-        <ul>
-          <li
-            v-for="scene in stageStore.scenes"
-            :key="scene.id"
-            :class="{ active: scene.id === stageStore.currentSceneId }"
-            @click="stageStore.setCurrentSceneId(scene.id)"
-          >
-            <span class="tag">{{ sceneTypeLabel[scene.type] ?? scene.type }}</span>
-            {{ scene.order }}. {{ scene.title }}
-          </li>
-        </ul>
-      </section>
+      <!-- 舞台区：侧边栏 + 场景渲染 -->
+      <div class="stage-body">
+        <SceneSidebar />
+        <section class="stage-main">
+          <SceneProvider>
+            <SceneRenderer />
+          </SceneProvider>
+        </section>
+      </div>
 
-      <!-- 当前场景数据展示（占位，Phase 3 起由 SceneRenderer 渲染） -->
-      <section v-if="currentScene" class="scene-detail">
-        <h2>当前场景：{{ currentScene.title }}</h2>
-        <p>类型：{{ sceneTypeLabel[currentScene.type] ?? currentScene.type }}</p>
-        <h3>剧本动作（{{ currentScene.actions?.length ?? 0 }} 条）</h3>
-        <ol>
-          <li v-for="(action, i) in currentScene.actions ?? []" :key="i">
-            {{ actionText(action as { type: string; text?: string; elementId?: string }) }}
-          </li>
-        </ol>
-      </section>
+      <!-- 字幕条（引擎 onSpeechStart 驱动；Phase 7 做逐字/语音同步） -->
+      <footer v-if="lectureSpeech" class="subtitle-bar">
+        {{ lectureSpeech }}
+      </footer>
     </template>
   </main>
 </template>
 
 <style scoped>
-.page {
-  padding: 2rem;
-  font-family: system-ui, -apple-system, sans-serif;
-  max-width: 900px;
-  margin: 0 auto;
+.classroom {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-.course-header h1 {
-  color: #1e3a8a;
-  margin-bottom: 0.25rem;
+.status {
+  margin: auto;
+  color: #64748b;
 }
-.scene-list ul {
-  list-style: none;
-  padding: 0;
-}
-.scene-list li {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  margin-bottom: 0.4rem;
-  cursor: pointer;
-}
-.scene-list li.active {
-  border-color: #2563eb;
-  background: #eff6ff;
-}
-.tag {
-  display: inline-block;
-  font-size: 0.75rem;
-  background: #e2e8f0;
-  border-radius: 4px;
-  padding: 0 0.35rem;
-  margin-right: 0.5rem;
-}
-.scene-detail {
-  margin-top: 1rem;
-  border: 1px dashed #cbd5e1;
-  border-radius: 8px;
-  padding: 1rem;
-}
-.error {
+.status.error {
   color: #b91c1c;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fff;
+}
+.course h1 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1e3a8a;
+}
+.course p {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+.stage-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.stage-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  background: #f1f5f9;
+}
+.subtitle-bar {
+  padding: 0.6rem 1.25rem;
+  background: #1e293b;
+  color: #f8fafc;
+  font-size: 0.95rem;
 }
 </style>

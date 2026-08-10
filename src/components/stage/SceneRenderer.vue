@@ -1,0 +1,36 @@
+<!--
+  文件头：场景分发器（SceneRenderer）
+  对应原项目：components/stage/scene-renderer.tsx
+  功能：按当前场景的 type 分发到对应渲染组件（slide/quiz/interactive）。
+  当前三个子组件为占位实现，Phase 4/5/6 逐个替换为真实渲染器。
+-->
+<script setup lang="ts">
+import { useScene } from '@/composables/useScene'
+import SlideView from '@/components/scenes/slide/SlideView.vue'
+import QuizView from '@/components/scenes/quiz/QuizView.vue'
+import InteractiveView from '@/components/scenes/interactive/InteractiveView.vue'
+
+const { scene } = useScene()
+</script>
+
+<template>
+  <div class="scene-renderer">
+    <SlideView v-if="scene?.type === 'slide'" :scene="scene" />
+    <QuizView v-else-if="scene?.type === 'quiz'" :scene="scene" />
+    <InteractiveView v-else-if="scene?.type === 'interactive'" :scene="scene" />
+    <p v-else class="empty">未选择场景</p>
+  </div>
+</template>
+
+<style scoped>
+.scene-renderer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.empty {
+  margin: auto;
+  color: #94a3b8;
+}
+</style>

@@ -41,3 +41,9 @@
 由用户人工仔细审核后自行提交。除非用户在对话中明确要求提交/推送。
 
 - [DEVELOPMENT-PLAN.md](./DEVELOPMENT-PLAN.md)：开发计划总览（范围/决策/阶段路线/文件对照/进度）
+
+- [PHASE-3.md](./PHASE-3.md)：页面框架 / 课堂外壳
+- [REFERENCE-PHASE-3.md](./REFERENCE-PHASE-3.md)：Phase 3 工作参考手册（逐文件/逐方法业务讲解）
+
+- [PHASE-4.md](./PHASE-4.md)：Slide 渲染器（画布/元素/聚光）
+- [REFERENCE-PHASE-4.md](./REFERENCE-PHASE-4.md)：Phase 4 工作参考手册（逐文件/逐方法业务讲解）

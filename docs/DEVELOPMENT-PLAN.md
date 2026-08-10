@@ -121,7 +121,7 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
   `mock/tts.ts`（静音 WAV）、`mock/quiz-grade.ts`（占位判分）、页面接线。
 - 验证：vitest 12 用例；build 通过。提交：`5ba0913`（规则五生效前）。
 
-### Phase 3 · 页面框架 / 课堂外壳 ⏳ 下一步
+### Phase 3 · 页面框架 / 课堂外壳 ✅ 已完成
 
 - 目标：课堂播放的「壳」——翻页、播放控制、场景分发。
 - 需求规划：
@@ -138,7 +138,7 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
   - `lib/api/stage-api-navigation.ts`（翻页语义）
 - 验收：进入课堂页可看到场景列表与当前场景；点上一页/下一页切换；播放/暂停能驱动引擎。
 
-### Phase 4 · Slide 渲染器（最大重写块）
+### Phase 4 · Slide 渲染器 ✅ 已完成
 
 - 目标：把 Slide 数据渲染成画面（自适应画布 + 元素 + 聚光）。
 - 需求规划：
@@ -246,9 +246,9 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 | 0 | 工程骨架 + 自建类型 | ✅ | fda0f56 |
 | 1 | 核心纯 TS 移植 | ✅ | fda0f56 |
 | 2 | mock 课堂数据 + 接口层 | ✅ | 5ba0913 |
-| 3 | 页面框架 / 课堂外壳 | ⏳ 下一步 | 待人工审核后提交 |
-| 4 | Slide 渲染器 | ⏳ | - |
-| 5 | Quiz 场景 | ⏳ | - |
+| 3 | 页面框架 / 课堂外壳 | ✅ | 待人工审核后提交（规则五：未提交） |
+| 4 | Slide 渲染器 | ✅ | 待人工审核后提交（规则五：未提交） |
+| 5 | Quiz 场景 | ⏳ 下一步 | - |
 | 6 | Interactive 场景 | ⏳ | - |
 | 7 | 语音文字同步 | ⏳ | - |
 | 8 | 互动闭环 | ⏳ | - |
