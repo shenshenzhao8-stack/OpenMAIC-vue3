@@ -45,9 +45,13 @@
 无新变更。本阶段存在一处「计划内裁剪」：
 
 - **元素类型范围**：仅实现 text / image / latex / shape；chart / table / line / video / code 渲染走
-  FallbackElement 占位，后续按需补充（记录于 TODO T-05 及渲染扩展项）。
+  FallbackElement 占位，后续按需补充（见开发计划 Phase 4.1 与 TODO T-17）。
 - 未实现动画（入场/强调）、翻页特效（turningMode）——不属于当前裁剪范围。
 
 ## 五、红线自检
 
 本阶段全部文件注释为中文业务讲解；无英文叙述性注释。
+
+> 范围变更（2026-08-11，Phase 4.1）：教学动作新增 laser（激光笔）；slide 元素类型收敛为
+> text / shape / line / image 四类（latex / chart / table / video / code 的类型与实现已删除，
+> 含 katex 依赖）。详见 docs/PHASE-4.1.md。

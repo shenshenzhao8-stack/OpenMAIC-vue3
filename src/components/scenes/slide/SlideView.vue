@@ -6,7 +6,7 @@
     2. 画布框（按视口自适应居中，卡片样式）；
     3. 内容层（1000×562.5 逻辑坐标，整体 scale）；
     4. 元素层（ScreenElement 逐个绝对定位渲染）；
-    5. 特效层（SpotlightOverlay 聚光遮罩）。
+    5. 特效层（SpotlightOverlay 聚光 + LaserOverlay 激光）。
   坐标系：元素 left/top/width/height 都是 1000×562.5 逻辑坐标，靠整体 scale 适配任意屏幕。
 -->
 <script setup lang="ts">
@@ -16,6 +16,7 @@ import { useViewportSize } from '@/composables/useViewportSize'
 import { useSlideBackgroundStyle } from '@/composables/useSlideBackgroundStyle'
 import ScreenElement from './ScreenElement.vue'
 import SpotlightOverlay from './SpotlightOverlay.vue'
+import LaserOverlay from './LaserOverlay.vue'
 
 const props = defineProps<{ scene: Scene | null }>()
 
@@ -61,6 +62,8 @@ const contentStyle = computed(() => ({
       </div>
       <!-- 聚光遮罩（相对画布框定位，DOM 测量） -->
       <SpotlightOverlay />
+      <!-- 激光笔（相对画布框定位，百分比几何） -->
+      <LaserOverlay />
     </div>
     <p v-else class="empty">无幻灯片数据</p>
   </div>

@@ -140,6 +140,9 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 
 ### Phase 4 · Slide 渲染器 ✅ 已完成
 
+> 范围偏差记录（2026-08-10）：计划 MVP 含 chart，实现时 chart 与 table/line/video/code 一并归入
+> FallbackElement 占位；Phase 4.1（2026-08-11）最终决策：仅补充 line，chart / table / video / code 与 latex 一并删除（见 PHASE-4.1 删除记录）。
+
 - 目标：把 Slide 数据渲染成画面（自适应画布 + 元素 + 聚光）。
 - 需求规划：
   1. `SlideView.vue`：背景层 + 内容层（1000×562.5 逻辑坐标，整体 scale）；
@@ -248,8 +251,17 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 | 2 | mock 课堂数据 + 接口层 | ✅ | 5ba0913 |
 | 3 | 页面框架 / 课堂外壳 | ✅ | 待人工审核后提交（规则五：未提交） |
 | 4 | Slide 渲染器 | ✅ | 待人工审核后提交（规则五：未提交） |
+| 4.1 | laser 激光笔 + slide 元素收敛四类 | ✅ | 待人工审核后提交（规则五：未提交） |
 | 5 | Quiz 场景 | ⏳ 下一步 | - |
 | 6 | Interactive 场景 | ⏳ | - |
 | 7 | 语音文字同步 | ⏳ | - |
 | 8 | 互动闭环 | ⏳ | - |
 | 9 | 打磨验收 | ⏳ | - |
+
+### Phase 4.1 · laser 激光笔 + slide 元素收敛四类 ✅ 已完成（2026-08-11）
+
+- 目标：教学动作新增 laser（激光笔）；slide 元素收敛为 text / shape / line / image 四类。
+- 新增：LaserOverlay（CSS 简化，不装 motion）、geometry 工具、LineElement（对照原 BaseLineElement）。
+- 删除：latex 实现与 katex 依赖、chart / table / video / code 占位与类型定义（删除记录见 PHASE-4.1.md）。
+- 验收：laser 按剧本执行并 5s 自动清除；四类元素渲染；grep 无多余类型残留；测试 39/39。
+- 工作量：约 1-2 天（已完成）。

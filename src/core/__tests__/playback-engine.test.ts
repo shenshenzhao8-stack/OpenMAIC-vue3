@@ -140,3 +140,32 @@ describe('PlaybackEngine（播放引擎）', () => {
     expect(engine.getMode()).toBe('idle')
   })
 })
+
+describe('PlaybackEngine（激光笔）', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('laser 火速动作触发 onEffectFire kind=laser 并继续播放', async () => {
+    const scene = makeSlideScene('sc1', 1, [
+      { id: 'a1', type: 'speech', text: '第一句' },
+      { id: 'a2', type: 'laser', elementId: 'img_1', color: '#00ff00' },
+    ])
+    const audioPlayer = new MockAudioPlayer()
+    const actionEngine = new ActionEngine(audioPlayer)
+    const events: string[] = []
+    const engine = new PlaybackEngine([scene], actionEngine, audioPlayer, {
+      onSpeechStart: (text) => events.push(`speech:${text}`),
+      onEffectFire: (effect) => events.push(`effect:${effect.kind}:${effect.targetId}`),
+      onComplete: () => events.push('complete'),
+      getPlaybackSpeed: () => 1,
+      isAgentSelected: () => true,
+    })
+
+    engine.start()
+    await flush()
+
+    expect(events).toEqual(['speech:第一句', 'effect:laser:img_1', 'complete'])
+    expect(engine.getMode()).toBe('idle')
+  })
+})

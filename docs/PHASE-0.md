@@ -95,3 +95,7 @@
 | 2026-08-07 | 移除生成页/生成预览页，主业务改为课堂播放；路由只保留 `/` 与 `/classroom/:id`；首页改为课堂入口 | 删除 `GeneratePage.vue`；移除 `/generate` 路由；删除路线图 Phase 9（生成流程）；mock 只保留课堂数据（`mock/classroom.ts`） | `app/generation-preview/page.tsx`、`components/generation/*`、`app/api/generate-classroom/*` 不在范围内 |
 
 > 依据规则二第 5 条：范围变更时，所有已完成的 PHASE-x.md 必须同步调整；本文件已按最新范围全量更新。
+
+> 范围变更（2026-08-11，Phase 4.1）：教学动作新增 laser（激光笔）；slide 元素类型收敛为
+> text / shape / line / image 四类（latex / chart / table / video / code 的类型与实现已删除，
+> 含 katex 依赖）。详见 docs/PHASE-4.1.md。

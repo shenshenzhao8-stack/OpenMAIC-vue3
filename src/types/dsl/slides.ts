@@ -1,14 +1,14 @@
 /**
  * 文件头：自建裁剪版「幻灯片数据模型」模块
  *
- * 对应原项目文件：packages/@openmaic/dsl/src/slides.ts（MAIC slide object model）
+ * 对应原项目：packages/@openmaic/dsl/src/slides.ts（MAIC slide object model）
  *
- * 为什么自建：
- *   1. 不使用 monorepo、不 vendor 整个 DSL 包（同 action.ts 的理由）；
- *   2. 幻灯片是裁剪范围内的核心场景（slide），其元素类型（PPTElement）全量保留，
- *      供 Phase 4 的 Vue 渲染器逐类实现；
- *   3. 字段与原项目**逐字段对应**（含 @since-merge 注解的字段），保证将来照搬
- *      原项目渲染组件（components/slide-renderer/**）时字段可用。
+ * 范围（2026-08-11 更新）：element 类型收敛为四类 —— text / shape / line / image。
+ * 已删除（含类型定义与辅助类型）：latex / chart / table / video / audio / code。
+ * 删除原因：本项目仅支持四类元素；删除记录与恢复路径见 docs/PHASE-4.1.md。
+ *
+ * 保留说明：ShapePathFormulasKeys（形状路径公式）、PPTAnimation（幻灯片级动画）、
+ * 背景/主题等与元素类型无关的结构保持不变。
  *
  * 维护约定：若原项目 slides.ts 的类型发生变更，本文件需同步核对。
  */
@@ -40,25 +40,19 @@ export enum ShapePathFormulasKeys {
   DIAGSTRIPE = 'diagStripe',
 }
 
-/** 幻灯片元素类型枚举（原项目 ElementTypes） */
+/** 幻灯片元素类型枚举（收敛为四类：text/shape/line/image） */
 export enum ElementTypes {
-  TEXT = 'text',
   IMAGE = 'image',
+  TEXT = 'text',
   SHAPE = 'shape',
   LINE = 'line',
-  CHART = 'chart',
-  TABLE = 'table',
-  LATEX = 'latex',
-  VIDEO = 'video',
-  AUDIO = 'audio',
-  CODE = 'code',
 }
 
 /** 渐变类型（线性 / 径向） */
 export type GradientType = 'linear' | 'radial'
 /** 渐变颜色节点：pos 为百分比位置，color 为颜色 */
 export type GradientColor = { pos: number; color: string }
-/** 渐变定义（原项目 Gradient） */
+/** 渐变定义（原项目 Gradient，形状填充用） */
 export interface Gradient {
   type: GradientType
   colors: GradientColor[]
@@ -106,7 +100,7 @@ export interface PPTBaseElement {
   groupId?: string
   width: number
   height: number
-  /** 旋转角度 */
+  /** 旋转角度（line 元素无此字段） */
   rotate: number
   link?: PPTElementLink
   name?: string
@@ -260,179 +254,39 @@ export interface PPTShapeElement extends PPTBaseElement {
 /** 线条端点样式 */
 export type LinePoint = '' | 'arrow' | 'dot'
 
-/** 线条元素（原项目 PPTLineElement，无 height/rotate） */
+/**
+ * 线条元素（原项目 PPTLineElement，无 height/rotate）。
+ * 注意：start/end 为画布坐标；width 字段语义是「线宽」而非元素宽度。
+ */
 export interface PPTLineElement extends Omit<PPTBaseElement, 'height' | 'rotate'> {
   type: 'line'
   start: [number, number]
   end: [number, number]
+  /** 默认 "solid" */
   style: LineStyleType
+  /** 默认 "#333333" */
   color: string
+  /** 端点样式，默认 ["", ""] */
   points: [LinePoint, LinePoint]
   shadow?: PPTElementShadow
+  /** 折线控制点 */
   broken?: [number, number]
+  /** 双折线控制点 */
   broken2?: [number, number]
+  /** 二次曲线控制点 */
   curve?: [number, number]
+  /** 三次曲线控制点 */
   cubic?: [[number, number], [number, number]]
 }
 
-/** 图表类型 */
-export type ChartType = 'bar' | 'column' | 'line' | 'pie' | 'ring' | 'area' | 'radar' | 'scatter'
-
-/** 图表扩展选项 */
-export interface ChartOptions {
-  lineSmooth?: boolean
-  stack?: boolean
-}
-
-/** 图表数据 */
-export interface ChartData {
-  labels: string[]
-  legends: string[]
-  series: number[][]
-}
-
-/** 图表元素（原项目 PPTChartElement，渲染时用 ECharts） */
-export interface PPTChartElement extends PPTBaseElement {
-  type: 'chart'
-  fill?: string
-  chartType: ChartType
-  data: ChartData
-  options?: ChartOptions
-  outline?: PPTElementOutline
-  themeColors: string[]
-  textColor?: string
-  lineColor?: string
-}
-
-/** 文本水平对齐 */
-export type TextAlign = 'left' | 'center' | 'right' | 'justify'
-
-/** 表格单元格样式 */
-export interface TableCellStyle {
-  bold?: boolean
-  em?: boolean
-  underline?: boolean
-  strikethrough?: boolean
-  color?: string
-  backcolor?: string
-  fontsize?: string
-  fontname?: string
-  align?: TextAlign
-}
-
-/** 单元格单边边框 */
-export interface TableCellBorder {
-  width: number
-  style: 'solid' | 'dashed' | 'dotted'
-  color: string
-}
-
-/** 表格单元格 */
-export interface TableCell {
-  id: string
-  colspan: number
-  rowspan: number
-  text: string
-  style?: TableCellStyle
-  padding?: string
-  vAlign?: 'top' | 'middle' | 'bottom'
-  borders?: {
-    top?: TableCellBorder
-    bottom?: TableCellBorder
-    left?: TableCellBorder
-    right?: TableCellBorder
-  }
-}
-
-/** 表格主题 */
-export interface TableTheme {
-  color: string
-  rowHeader: boolean
-  rowFooter: boolean
-  colHeader: boolean
-  colFooter: boolean
-}
-
-/** 表格元素（原项目 PPTTableElement） */
-export interface PPTTableElement extends PPTBaseElement {
-  type: 'table'
-  outline: PPTElementOutline
-  theme?: TableTheme
-  /** 列宽数组（百分比小数），如 [0.3, 0.5, 0.2] */
-  colWidths: number[]
-  cellMinHeight: number
-  rowHeights?: number[]
-  data: TableCell[][]
-}
-
-/** LaTeX 公式元素（原项目 PPTLatexElement，渲染时用 KaTeX） */
-export interface PPTLatexElement extends PPTBaseElement {
-  type: 'latex'
-  /** LaTeX 源码 */
-  latex: string
-  /** KaTeX 渲染好的 HTML（新版公式使用） */
-  html?: string
-  /** 旧版 SVG 渲染路径（向后兼容） */
-  path?: string
-  color?: string
-  strokeWidth?: number
-  viewBox?: [number, number]
-  fixedRatio?: boolean
-  align?: 'left' | 'center' | 'right'
-}
-
-/** 视频元素（原项目 PPTVideoElement） */
-export interface PPTVideoElement extends PPTBaseElement {
-  type: 'video'
-  src?: AssetRef
-  /** 生成视频的资源引用 */
-  mediaRef?: AssetRef
-  autoplay: boolean
-  poster?: string
-  ext?: string
-}
-
-/** 音频元素（原项目 PPTAudioElement） */
-export interface PPTAudioElement extends PPTBaseElement {
-  type: 'audio'
-  fixedRatio: boolean
-  color: string
-  loop: boolean
-  autoplay: boolean
-  src: string
-  ext?: string
-}
-
-/** 代码行（原项目 CodeLine） */
-export interface CodeLine {
-  id: string
-  content: string
-}
-
-/** 代码元素（原项目 PPTCodeElement） */
-export interface PPTCodeElement extends PPTBaseElement {
-  type: 'code'
-  language: string
-  lines: CodeLine[]
-  fileName?: string
-  showLineNumbers?: boolean
-  fontSize?: number
-}
-
-/** 全部幻灯片元素的联合类型（原项目 PPTElement） */
+/** 全部幻灯片元素的联合类型（收敛为四类） */
 export type PPTElement =
   | PPTTextElement
-  | PPTImageElement
   | PPTShapeElement
   | PPTLineElement
-  | PPTChartElement
-  | PPTTableElement
-  | PPTLatexElement
-  | PPTVideoElement
-  | PPTAudioElement
-  | PPTCodeElement
+  | PPTImageElement
 
-// ==================== 动画 ====================
+// ==================== 动画（幻灯片级，保留） ====================
 
 /** 动画类型（入场 / 退场 / 强调） */
 export type AnimationType = 'in' | 'out' | 'attention'
@@ -511,7 +365,7 @@ export interface Slide {
   /** 视口宽高比（默认 0.5625 = 16:9） */
   viewportRatio: number
   theme: SlideTheme
-  /** 元素集合（绝对定位） */
+  /** 元素集合（绝对定位，仅四类） */
   elements: PPTElement[]
   background?: SlideBackground
   animations?: PPTAnimation[]

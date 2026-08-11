@@ -47,3 +47,6 @@
 
 - [PHASE-4.md](./PHASE-4.md)：Slide 渲染器（画布/元素/聚光）
 - [REFERENCE-PHASE-4.md](./REFERENCE-PHASE-4.md)：Phase 4 工作参考手册（逐文件/逐方法业务讲解）
+
+- [PHASE-4.1.md](./PHASE-4.1.md)：laser 激光笔 + slide 元素收敛四类
+- [REFERENCE-PHASE-4.1.md](./REFERENCE-PHASE-4.1.md)：Phase 4.1 工作参考手册（逐文件/逐方法业务讲解）

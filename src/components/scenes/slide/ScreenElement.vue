@@ -1,8 +1,8 @@
 <!--
   文件头：幻灯片元素分发器
   对应原项目：components/slide-renderer/Editor/ScreenElement.tsx
-  功能：
-    1. 按 element.type 分发到对应元素组件（text/image/latex/shape，其余走占位）；
+  功能（2026-08-11 范围收敛为四类元素：text / shape / line / image）：
+    1. 按 element.type 分发到对应元素组件；
     2. 绝对定位（left/top/width/height + rotate + zIndex）；
     3. ★ 根节点 id 固定为 `screen-element-{element.id}`——聚光遮罩靠它 DOM 定位。
 -->
@@ -10,10 +10,9 @@
 import { computed } from 'vue'
 import type { PPTElement, SlideTheme } from '@/types/dsl'
 import TextElement from './elements/TextElement.vue'
-import ImageElement from './elements/ImageElement.vue'
-import LatexElement from './elements/LatexElement.vue'
 import ShapeElement from './elements/ShapeElement.vue'
-import FallbackElement from './elements/FallbackElement.vue'
+import LineElement from './elements/LineElement.vue'
+import ImageElement from './elements/ImageElement.vue'
 
 const props = defineProps<{ element: PPTElement; theme?: SlideTheme; index?: number }>()
 
@@ -36,18 +35,17 @@ const positionStyle = computed(() => ({
 
 // 按类型收窄（模板类型收窄不可靠，这里用 computed 保证类型安全）
 const textElement = computed(() => (props.element.type === 'text' ? props.element : null))
-const imageElement = computed(() => (props.element.type === 'image' ? props.element : null))
-const latexElement = computed(() => (props.element.type === 'latex' ? props.element : null))
 const shapeElement = computed(() => (props.element.type === 'shape' ? props.element : null))
+const lineElement = computed(() => (props.element.type === 'line' ? props.element : null))
+const imageElement = computed(() => (props.element.type === 'image' ? props.element : null))
 </script>
 
 <template>
   <div class="screen-element" :id="`screen-element-${element.id}`" :style="positionStyle">
     <TextElement v-if="textElement" :element="textElement" />
-    <ImageElement v-else-if="imageElement" :element="imageElement" />
-    <LatexElement v-else-if="latexElement" :element="latexElement" />
     <ShapeElement v-else-if="shapeElement" :element="shapeElement" />
-    <FallbackElement v-else :element="element" />
+    <LineElement v-else-if="lineElement" :element="lineElement" />
+    <ImageElement v-else-if="imageElement" :element="imageElement" />
   </div>
 </template>
 

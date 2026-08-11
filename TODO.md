@@ -4,7 +4,7 @@
 > 维护规则：依据当前 OpenMAIC 项目根目录 `AGENTS.md`（规则二/三）——
 > ① 范围发生变更时，本表必须同步更新；② 每完成一个阶段，回到本表勾选已落实/已确认的条目。
 
-## 当前状态（2026-08-07，Phase 2 完成）
+## 当前状态（2026-08-11，Phase 4.1 完成）
 
 | 编号 | 待确认 / 可能变更的点 | 当前假设 | 涉及阶段 / 文件 | 触发条件 / 来源 | 建议处理 |
 |---|---|---|---|---|---|
@@ -13,7 +13,7 @@
 | T-03 | 后台聊天 SSE 事件是否携带老师回答的音频（如 `agent_end` / `text_delta` 附带 `audioUrl`） | 假设 SSE 只推文本与动作，语音走独立 TTS 队列（useDiscussionTTS） | Phase 8 互动闭环、`src/core/chat/agent-loop.ts`、`src/core/buffer/stream-buffer.ts` | 后台 SSE 协议确认 | 若事件自带音频：useDiscussionTTS 简化为「收到 audioUrl 直接播放」；若无：保留 TTS 队列 |
 | T-04 | 学生语音输入（STT）是否纳入 | 暂不实现，学生用文本提问 | Phase 8 后扩展 | 用户需求补充 | 预留「麦克风输入」扩展点：STT 结果进入输入框后走普通文本消息通道 |
 | T-05 | interactive 场景的 widget 子类型范围 | 先做 iframe 渲染（html），widget 配置用 `Record<string, unknown>` 占位 | Phase 6、`src/types/stage.ts` | 需求确认 | 确定子类型后补 `WidgetConfig` 联合类型（对应原 `lib/types/widgets.ts`） |
-| T-06 | 教学动作是否扩展：laser / 白板 / discussion / widget 动作的恢复 | 裁剪为 speech + spotlight；ActionEngine 其他分支 no-op | `src/core/action/engine.ts`、`src/core/playback/engine.ts` | 需求变更 | 若要恢复：ActionEngine 对应分支补实现 + canvas store 补状态字段；引擎本体无需改 |
+| T-06 | 教学动作是否扩展：白板 / discussion / widget 动作的恢复（laser 已恢复） | laser 已于 Phase 4.1 恢复；白板 / discussion / widget 仍裁剪，ActionEngine 其余分支 no-op | `src/core/action/engine.ts`、`src/core/playback/engine.ts` | 需求变更 | 若恢复白板/讨论/widget：ActionEngine 对应分支补实现 + canvas store 补状态字段；引擎本体无需改 |
 | T-08 | 测验简答题判分：由后台 AI 判分接口承接，还是前端 mock | mock `/quiz-grade` 返回 `{ score, comment }`（Phase 2 已建） | Phase 5、`src/api/` | 后台确认 | 入参已按原项目对齐，切换时只换 client 实现 |
 | T-09 | 音频缓存策略：是否需要本地缓存（IndexedDB） | 当前内存 Map（`localAudioCache`） | `src/core/audio/audio-player.ts` | 实际使用需要 | 需要时换 IndexedDB（原项目用 Dexie） |
 | T-10 | 播放位置持久化（刷新恢复）是否联动后台 | 暂未实现；原项目存本地 KV（`playback-cursor`） | Phase 3/7、`src/core/playback/cursor.ts`（未移植） | 需求确认 | 需要则移植（本项目用 localStorage 替代 KV） |
@@ -29,3 +29,4 @@
 |---|---|---|
 | T-07 | 已落实 | Phase 2 采用「一次性返回完整 Stage JSON」的 mock 实现（getClassroom 返回 stage+scenes）；若后台分页，在 client.ts 加聚合 |
 | T-13 | 已落实（机制就绪） | Phase 2 建立统一 `src/api/client.ts`，mock/真实切换只改该文件；各函数已标注对应后端接口 |
+| T-17 | 已落实（2026-08-11） | 按需求决策：slide 元素仅补充 **line**；chart / table / video / code 与 **latex**（含类型定义、实现、katex 依赖）全部删除；删除记录见 docs/PHASE-4.1.md |

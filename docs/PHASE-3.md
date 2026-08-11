@@ -52,3 +52,7 @@
 ## 五、红线自检
 
 本阶段全部文件注释为中文业务讲解；无英文叙述性注释。
+
+> 范围变更（2026-08-11，Phase 4.1）：教学动作新增 laser（激光笔）；slide 元素类型收敛为
+> text / shape / line / image 四类（latex / chart / table / video / code 的类型与实现已删除，
+> 含 katex 依赖）。详见 docs/PHASE-4.1.md。

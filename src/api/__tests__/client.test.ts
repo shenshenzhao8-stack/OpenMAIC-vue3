@@ -41,7 +41,7 @@ describe('接口层 client（mock）', () => {
     expect(list[0].scenesCount).toBeGreaterThan(0)
   })
 
-  it('getClassroom(demo) 返回三种场景且动作仅 speech/spotlight', async () => {
+  it('getClassroom(demo) 返回三种场景且动作仅 speech/spotlight/laser', async () => {
     const { stage, scenes } = await getClassroom('demo')
     expect(stage.name).toBe('光合作用')
     // 三种场景类型都出现
@@ -52,7 +52,7 @@ describe('接口层 client（mock）', () => {
     // 动作白名单校验（裁剪范围：speech + spotlight）
     for (const scene of scenes) {
       for (const action of scene.actions ?? []) {
-        expect(['speech', 'spotlight']).toContain(action.type)
+        expect(['speech', 'spotlight', 'laser']).toContain(action.type)
       }
     }
   })

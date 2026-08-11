@@ -2,15 +2,13 @@
  * 文件头：mock 示例课堂数据
  *
  * 对应原项目：无直接对应文件（原项目课堂数据由「生成管线」产出）。
- * 数据形状对照：packages/@openmaic/dsl 的 Stage/Scene/Slide/Quiz 类型，
- * 以及 lib/server/classroom-generation.ts 的输出结构。
+ * 数据形状对照：packages/@openmaic/dsl 的 Stage/Scene/Slide/Quiz 类型。
  *
- * 为什么建这个文件（需求 6）：AI 部分由后台接口承接，现阶段用 mock 保证流程完整；
- * 本文件提供一份「光合作用」示例课程（slide/quiz/interactive 三种场景，
- * 动作仅 speech + spotlight），课堂页加载后即可播放/展示。
+ * 范围说明（2026-08-11 更新）：
+ *   - 教学动作：speech / spotlight / laser；
+ *   - slide 元素：仅 text / shape / line / image（已移除 latex 元素示例）。
  *
- * 注意：speech 动作暂不填 audioUrl/audioId（后台真实数据会带音频，见 TODO T-01），
- * 播放时由引擎走「朗读计时」或浏览器 TTS 兜底。
+ * 注意：speech 动作暂不填 audioUrl/audioId（后台真实数据会带音频，见 TODO T-01）。
  */
 import type { Scene, Stage } from '@/types/stage'
 import type { Action } from '@/types/action'
@@ -30,11 +28,12 @@ export const mockClassroomStage: Stage = {
   agentIds: ['default-1'],
 }
 
-/** 第一页：封面幻灯片（文字 + 图片 + 公式），演示 speech + spotlight 动作 */
+/** 第一页：封面幻灯片（文字 + 图片 + 线条箭头），演示 speech / spotlight / laser 动作 */
 const slide1Actions: Action[] = [
   { id: 'a1', type: 'speech', text: '同学们好，今天我们来学习光合作用。' },
   { id: 'a2', type: 'spotlight', elementId: 'img_leaf', dimOpacity: 0.5 },
-  { id: 'a3', type: 'speech', text: '请看这张图，这是光合作用的总反应式。' },
+  { id: 'a3', type: 'laser', elementId: 'txt_title', color: '#ff0000' },
+  { id: 'a4', type: 'speech', text: '请看标题与这张图，这是光合作用。' },
 ]
 
 /** 第二页：随堂测验（单选 + 多选 + 简答） */
@@ -50,7 +49,7 @@ const interactiveActions: Action[] = [
 /** 第四页：光反应与暗反应总结 */
 const slide2Actions: Action[] = [
   { id: 'd1', type: 'speech', text: '总结一下：光反应在类囊体薄膜，暗反应在基质。' },
-  { id: 'd2', type: 'spotlight', elementId: 'txt_summary' },
+  { id: 'd2', type: 'laser', elementId: 'txt_summary', color: '#ff0000' },
 ]
 
 /** 内联 SVG 图片（data URI，无需网络即可显示） */
@@ -121,15 +120,17 @@ export const mockClassroomScenes: Scene[] = [
             src: leafSvgDataUri,
           },
           {
-            id: 'eq_1',
-            type: 'latex',
-            left: 420,
-            top: 230,
-            width: 520,
-            height: 90,
-            rotate: 0,
-            latex: '6CO_2 + 6H_2O \\xrightarrow{光} C_6H_{12}O_6 + 6O_2',
+            // 线条箭头：从标题下方指向图片（start/end 为画布绝对坐标，left/top 置 0）
+            id: 'line_arrow',
+            type: 'line',
+            left: 0,
+            top: 0,
+            width: 3,
+            start: [430, 180],
+            end: [760, 260],
+            style: 'solid',
             color: '#1a5276',
+            points: ['', 'arrow'],
           },
         ],
       },

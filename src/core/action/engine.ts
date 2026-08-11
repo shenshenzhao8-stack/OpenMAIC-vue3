@@ -6,11 +6,12 @@
  * 裁剪说明：
  *   原项目 ActionEngine 是「在线流式」与「离线播放」共用的唯一执行层，
  *   支持 speech / spotlight / laser / 白板 / 视频 / widget 等全部动作。
- *   按需求 2（教学动作仅保留聚光 + 讲解语音），本文件裁剪为只实现：
+ *   按范围要求（教学动作：speech + spotlight + laser，2026-08-11 更新），
+ *   本文件实现：
  *     - spotlight：改 canvas store（聚光状态）→ 界面自动响应；
+ *     - laser：改 canvas store（激光目标）→ LaserOverlay 自动响应；
  *     - speech：交给 AudioPlayer 播放，播完 resolve（引擎据此走下一步）。
- *   其余动作类型（laser / wb_* / widget_* / play_video / discussion）直接 no-op，
- *   保证播放引擎（照搬）里那些分支永远不会真正执行。
+ *   其余动作类型（wb_* / widget_* / play_video / discussion）直接 no-op。
  *
  * 保留的对外接口（播放引擎调用）：
  *   - execute(action, options?)       执行单个动作
@@ -18,14 +19,14 @@
  *   - resetPlaybackVisualState()      重置播放视觉状态（跳转前调用）
  *   - dispose()                       清理定时器
  */
-import type { Action, SpotlightAction, SpeechAction } from '@/types/action'
+import type { Action, SpotlightAction, LaserAction, SpeechAction } from '@/types/action'
 import type { AudioPlayer } from '@/core/audio/audio-player'
 import { useCanvasStore } from '@/stores/canvas'
 import { EFFECT_AUTO_CLEAR_MS } from '@/core/choreography'
 
 /** 动作执行选项 */
 export interface ActionExecutionOptions {
-  /** 静默模式：跳转/重放时使用，speech/spotlight 等不产生实际效果 */
+  /** 静默模式：跳转/重放时使用，speech/spotlight/laser 等不产生实际效果 */
   silent?: boolean
 }
 
@@ -37,7 +38,7 @@ export interface ActionExecutionOptions {
 export class ActionEngine {
   /** 音频播放器（可空：无音频时 speech 直接完成） */
   private audioPlayer: AudioPlayer | null
-  /** 特效自动清除定时器（聚光 5 秒后熄灭） */
+  /** 特效自动清除定时器（聚光/激光 5 秒后熄灭） */
   private effectTimer: ReturnType<typeof setTimeout> | null = null
 
   constructor(audioPlayer?: AudioPlayer | null) {
@@ -54,7 +55,7 @@ export class ActionEngine {
 
   /**
    * 执行单个动作。
-   * - 火速动作（spotlight）：立即执行并返回；
+   * - 火速动作（spotlight/laser）：立即执行并返回；
    * - 同步动作（speech）：返回 Promise，音频播完才 resolve；
    * - 裁剪范围外的动作：no-op。
    */
@@ -70,10 +71,13 @@ export class ActionEngine {
       case 'spotlight':
         this.executeSpotlight(action)
         return
+      case 'laser':
+        this.executeLaser(action)
+        return
       case 'speech':
         return this.executeSpeech(action)
       default:
-        // 裁剪范围外的动作（laser / 白板 / 视频 / widget / discussion）：不做任何事
+        // 裁剪范围外的动作（白板 / 视频 / widget / discussion）：不做任何事
         return
     }
   }
@@ -100,8 +104,8 @@ export class ActionEngine {
 
   /**
    * 为火速特效安排自动清除：
-   * 每次执行聚光后重置定时器，EFFECT_AUTO_CLEAR_MS（5 秒）后调用
-   * canvas store 的 clearAllEffects()，保证聚光不会一直亮着。
+   * 每次执行聚光/激光后重置定时器，EFFECT_AUTO_CLEAR_MS（5 秒）后调用
+   * canvas store 的 clearAllEffects()，保证特效不会一直亮着。
    */
   private scheduleEffectClear(): void {
     if (this.effectTimer) {
@@ -119,6 +123,14 @@ export class ActionEngine {
   private executeSpotlight(action: SpotlightAction): void {
     useCanvasStore.getState().setSpotlight(action.elementId, {
       dimness: action.dimOpacity ?? 0.5,
+    })
+    this.scheduleEffectClear()
+  }
+
+  /** 执行激光笔：把「目标元素 id + 颜色」写入 canvas store，LaserOverlay 自动响应 */
+  private executeLaser(action: LaserAction): void {
+    useCanvasStore.getState().setLaser(action.elementId, {
+      color: action.color ?? '#ff0000',
     })
     this.scheduleEffectClear()
   }

@@ -137,3 +137,7 @@ speech+spotlight 动作的完整课程 JSON）、`src/api/` 接口层（chat SSE
 1. **8 个照搬文件逻辑一致**（去风格差异后 diff 为 0）；
 2. 修复前存在两类偏差：① 行尾分号（全局风格差异，功能等价，保留本项目无分号风格）；② 上述 19 处细节（已全部修复）；
 3. 措辞修正：此前文档写「逐行一致」不精确，应为「代码逻辑一致，存在无分号等风格差异」。
+
+> 范围变更（2026-08-11，Phase 4.1）：教学动作新增 laser（激光笔）；slide 元素类型收敛为
+> text / shape / line / image 四类（latex / chart / table / video / code 的类型与实现已删除，
+> 含 katex 依赖）。详见 docs/PHASE-4.1.md。
