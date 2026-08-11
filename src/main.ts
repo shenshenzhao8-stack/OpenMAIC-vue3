@@ -12,6 +12,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
+import './styles.css'
 import router from './router'
 
 // 创建 Vue 应用实例

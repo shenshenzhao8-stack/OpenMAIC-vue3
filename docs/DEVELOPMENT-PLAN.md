@@ -168,15 +168,16 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 - 原项目文件对照：`components/scene-renderers/quiz-view.tsx`（状态机，简化相位）、`lib/quiz/grading.ts`（仅保留对错判断）。
 - 验收：封面→答题→提交→复盘；选择题对错徽标；简答题参考答案；测试 44/44。
 
-### Phase 6 · Interactive 场景
+### Phase 6 · Interactive 场景 ✅ 已完成（2026-08-11）
 
-- 目标：AI 生成的 HTML 在 iframe 中安全渲染，切页不丢状态。
-- 需求规划：`iframe.ts` 安全补丁（照搬纯函数）；iframe 保活池（Pinia 仿写）；
-  `InteractiveRenderer.vue`（占位+上报矩形）+ `InteractiveIframeHost.vue`（Teleport 覆盖）；
-  sandbox 无 allow-same-origin（安全隔离）。
-- 原项目文件对照：`lib/utils/iframe.ts`、`lib/store/interactive-iframe-pool.ts`、
-  `components/scene-renderers/interactive-renderer.tsx`、`InteractiveIframeHost.tsx`。
-- 验收：交互页显示 iframe；切走再切回状态不丢；无 widget 命令（T-05 待确认子类型）。
+- 目标：AI 生成的 HTML 在沙箱 iframe 中安全渲染，切页不丢状态。
+- 需求规划：
+  1. 安全补丁（iframe.ts 照搬）：storage shim + error shim + CSS；
+  2. 保活池（Pinia 仿写）：entries/sceneId + LRU 上限 3 + owner 可见权；
+  3. 分层：InteractiveRenderer 占位（登记+认领+上报矩形）→ InteractiveIframeHost（Teleport + fixed 覆盖 + visibility 保活）；
+  4. sandbox 无 allow-same-origin（隔离）；无 widget 命令（已裁剪）。
+- 原项目文件对照：lib/utils/iframe.ts、lib/store/interactive-iframe-pool.ts、interactive-renderer.tsx、InteractiveIframeHost.tsx。
+- 验收：交互页显示 iframe；切走再切回状态不丢；测试 52/52。
 
 ### Phase 7 · 语音文字同步
 
@@ -256,8 +257,8 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 | 4 | Slide 渲染器 | ✅ | 待人工审核后提交（规则五：未提交） |
 | 4.1 | laser 激光笔 + slide 元素收敛四类 | ✅ | 待人工审核后提交（规则五：未提交） |
 | 5 | Quiz 场景 | ✅ | 待人工审核后提交（规则五：未提交） |
-| 6 | Interactive 场景 | ⏳ 下一步 | - |
-| 7 | 语音文字同步 | ⏳ | - |
+| 6 | Interactive 场景 | ✅ | 待人工审核后提交（规则五：未提交） |
+| 7 | 语音文字同步 | ⏳ 下一步 | - |
 | 8 | 互动闭环 | ⏳ | - |
 | 9 | 打磨验收 | ⏳ | - |
 

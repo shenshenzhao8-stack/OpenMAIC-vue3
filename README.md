@@ -26,4 +26,5 @@ OpenMAIC 项目根目录的 `AGENTS.md`，本仓库不再单独复制规则文�
 - [x] Phase 3：页面框架 / 课堂外壳（播放控制/翻页/场景分发）
 - [x] Phase 4：Slide 渲染器（画布/元素/聚光）
 - [x] Phase 5：Quiz 场景（无判分）
-- [ ] 后续阶段（interactive 渲染、语音同步、互动闭环）
+- [x] Phase 6：Interactive 场景（iframe 安全渲染 + 保活池）
+- [ ] 后续阶段（语音同步、互动闭环）

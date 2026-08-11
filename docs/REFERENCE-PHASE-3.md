@@ -82,3 +82,7 @@ PlaybackChromeRoot 的引擎创建与回调接线。
 | 日期 | 内容 |
 |---|---|
 | 2026-08-10 | 初版：依据 Phase 3 完成后的讲解整理输出 |
+
+| 日期 | 内容 |
+|---|---|
+| 2026-08-11 | 布局修复：新增全局样式重置（body margin/height、overflow-x），课堂容器 height 100% + overflow hidden，顶栏 flex-wrap + 标题 min-width:0（修复竖向滚动条与横向溢出） |

@@ -1,11 +1,11 @@
 <!--
   文件头：课堂播放页（课堂外壳）
   对应原项目：app/classroom/[id]/page.tsx（加载课堂）+ components/stage.tsx（舞台根）+ PlaybackChromeRoot（引擎接线）
-  功能（Phase 3）：
+  功能（Phase 3-6）：
     1. 加载 mock 课堂数据并写入 stage store；
     2. 课堂外壳：顶栏（课程信息 + 播放控制）、侧边栏（场景列表）、主区（场景渲染分发）；
-    3. 播放引擎接线：usePlaybackEngine（播放/暂停/翻页/字幕）。
-  说明：场景渲染当前为占位（Phase 4/5/6 替换）；互动（学生提问）在 Phase 8 接入。
+    3. 播放引擎接线：usePlaybackEngine；
+    4. 全局挂载 InteractiveIframeHost：交互场景的 iframe 不随场景切换卸载（保活）。
 -->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
@@ -18,6 +18,7 @@ import HeaderControls from '@/components/stage/HeaderControls.vue'
 import SceneSidebar from '@/components/stage/SceneSidebar.vue'
 import SceneProvider from '@/components/stage/SceneProvider.vue'
 import SceneRenderer from '@/components/stage/SceneRenderer.vue'
+import InteractiveIframeHost from '@/components/scenes/interactive/InteractiveIframeHost.vue'
 
 const route = useRoute()
 const stageStore = useStageStore()
@@ -86,12 +87,16 @@ onMounted(async () => {
         {{ lectureSpeech }}
       </footer>
     </template>
+
+    <!-- 全局交互 iframe 宿主：保活，不随场景切换卸载 -->
+    <InteractiveIframeHost />
   </main>
 </template>
 
 <style scoped>
 .classroom {
-  height: 100vh;
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -106,10 +111,14 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 1rem;
   padding: 0.75rem 1.25rem;
   border-bottom: 1px solid #e2e8f0;
   background: #fff;
+}
+.course {
+  min-width: 0;
 }
 .course h1 {
   margin: 0;

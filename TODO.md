@@ -12,7 +12,7 @@
 | T-02 | 后台数据结构字段命名是否与自建类型一致（`persona`、`audioId/audioUrl`、`scene/actions`、`content.canvas` 等） | 自建类型严格对齐原项目 `@openmaic/dsl` 命名 | `src/types/dsl/*`、`src/types/stage.ts`、`mock/classroom.ts` | 后台契约确定后 | 后台接口文档就绪后做「字段映射核对表」，不一致处加适配层（不改自建类型） |
 | T-03 | 后台聊天 SSE 事件是否携带老师回答的音频（如 `agent_end` / `text_delta` 附带 `audioUrl`） | 假设 SSE 只推文本与动作，语音走独立 TTS 队列（useDiscussionTTS） | Phase 8 互动闭环、`src/core/chat/agent-loop.ts`、`src/core/buffer/stream-buffer.ts` | 后台 SSE 协议确认 | 若事件自带音频：useDiscussionTTS 简化为「收到 audioUrl 直接播放」；若无：保留 TTS 队列 |
 | T-04 | 学生语音输入（STT）是否纳入 | 暂不实现，学生用文本提问 | Phase 8 后扩展 | 用户需求补充 | 预留「麦克风输入」扩展点：STT 结果进入输入框后走普通文本消息通道 |
-| T-05 | interactive 场景的 widget 子类型范围 | 先做 iframe 渲染（html），widget 配置用 `Record<string, unknown>` 占位 | Phase 6、`src/types/stage.ts` | 需求确认 | 确定子类型后补 `WidgetConfig` 联合类型（对应原 `lib/types/widgets.ts`） |
+| T-05 | interactive 场景的 widget 子类型范围 | iframe 渲染已实现（Phase 6）；widget 配置仍用 `Record<string, unknown>` 占位，待子类型确认后细化 | Phase 6、`src/types/stage.ts` | 需求确认 | 确定子类型后补 `WidgetConfig` 联合类型（对应原 `lib/types/widgets.ts`） |
 | T-06 | 教学动作是否扩展：白板 / discussion / widget 动作的恢复（laser 已恢复） | laser 已于 Phase 4.1 恢复；白板 / discussion / widget 仍裁剪，ActionEngine 其余分支 no-op | `src/core/action/engine.ts`、`src/core/playback/engine.ts` | 需求变更 | 若恢复白板/讨论/widget：ActionEngine 对应分支补实现 + canvas store 补状态字段；引擎本体无需改 |
 | T-08 | 测验简答题判分：由后台 AI 判分接口承接，还是前端 mock | **已裁剪（2026-08-11）**：无判分业务，gradeQuiz 与 mock 已删除 | Phase 5、`src/api/` | 后台确认 | 入参已按原项目对齐，切换时只换 client 实现 |
 | T-09 | 音频缓存策略：是否需要本地缓存（IndexedDB） | 当前内存 Map（`localAudioCache`） | `src/core/audio/audio-player.ts` | 实际使用需要 | 需要时换 IndexedDB（原项目用 Dexie） |

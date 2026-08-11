@@ -53,3 +53,6 @@
 
 - [PHASE-5.md](./PHASE-5.md)：Quiz 场景（无判分）
 - [REFERENCE-PHASE-5.md](./REFERENCE-PHASE-5.md)：Phase 5 工作参考手册（逐文件/逐方法业务讲解）
+
+- [PHASE-6.md](./PHASE-6.md)：Interactive 场景（iframe 安全渲染 + 保活池）
+- [REFERENCE-PHASE-6.md](./REFERENCE-PHASE-6.md)：Phase 6 工作参考手册（逐文件/逐方法业务讲解）
