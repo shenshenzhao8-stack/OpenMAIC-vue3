@@ -71,3 +71,18 @@ describe('接口层 client（mock）', () => {
     expect(events.some((e) => e.type === 'text_delta')).toBe(true)
   })
 })
+
+describe('mock 课堂 slide 元素类型', () => {
+  it('四类元素（text/shape/line/image）齐全', async () => {
+    const { scenes } = await getClassroom('demo')
+    const elementTypes = new Set<string>()
+    for (const scene of scenes) {
+      if (scene.type === 'slide' && scene.content.type === 'slide') {
+        for (const el of scene.content.canvas.elements) {
+          elementTypes.add(el.type)
+        }
+      }
+    }
+    expect(elementTypes).toEqual(new Set(['text', 'shape', 'line', 'image']))
+  })
+})

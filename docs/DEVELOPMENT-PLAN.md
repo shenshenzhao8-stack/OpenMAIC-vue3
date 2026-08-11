@@ -156,14 +156,17 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
   - `components/slide-renderer/Editor/ScreenElement.tsx`、`Base*Element.tsx`、`SpotlightOverlay.tsx`
 - 验收：mock slide 渲染成完整画面；播放时聚光按剧本在对应元素亮起并 5 秒后熄灭。
 
-### Phase 5 · Quiz 场景
+### Phase 5 · Quiz 场景 ✅ 已完成（2026-08-11）
 
-- 目标：测验全流程（封面 → 答题 → 提交 → 判分 → 复盘）。
-- 需求规划：`QuizView.vue`（5 相位状态机）+ 三种题型组件；
-  选择题本地判分（grading.ts 已搬）；简答题走 `client.gradeQuiz()`（mock 已建）；
-  作答草稿/结果用 localStorage 简化（T-08）。
-- 原项目文件对照：`components/scene-renderers/quiz-view.tsx`、`lib/quiz/*`。
-- 验收：选择题提交后本地判分；简答题 mock 返回评分与评语；结果页含解析与重试。
+- 目标：测验全流程（封面 → 答题 → 复盘），**无判分**——无得分 / 无 AI 判分 / 无解析讲解。
+- 需求规划：
+  1. `QuizView.vue`（3 相位：not_started → answering → reviewing）；
+  2. 三种题型组件（单选 / 多选 / 简答）；
+  3. 复盘：选择题显示对错（✓/✗，本地比较）；简答题显示参考答案；
+  4. 作答草稿 localStorage 简化；
+  5. 裁剪：删除 grading.ts / client.gradeQuiz / quiz-grade mock；QuizQuestion 去掉 points / analysis / commentPrompt / hasAnswer。
+- 原项目文件对照：`components/scene-renderers/quiz-view.tsx`（状态机，简化相位）、`lib/quiz/grading.ts`（仅保留对错判断）。
+- 验收：封面→答题→提交→复盘；选择题对错徽标；简答题参考答案；测试 44/44。
 
 ### Phase 6 · Interactive 场景
 
@@ -252,8 +255,8 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 | 3 | 页面框架 / 课堂外壳 | ✅ | 待人工审核后提交（规则五：未提交） |
 | 4 | Slide 渲染器 | ✅ | 待人工审核后提交（规则五：未提交） |
 | 4.1 | laser 激光笔 + slide 元素收敛四类 | ✅ | 待人工审核后提交（规则五：未提交） |
-| 5 | Quiz 场景 | ⏳ 下一步 | - |
-| 6 | Interactive 场景 | ⏳ | - |
+| 5 | Quiz 场景 | ✅ | 待人工审核后提交（规则五：未提交） |
+| 6 | Interactive 场景 | ⏳ 下一步 | - |
 | 7 | 语音文字同步 | ⏳ | - |
 | 8 | 互动闭环 | ⏳ | - |
 | 9 | 打磨验收 | ⏳ | - |

@@ -66,3 +66,11 @@ PPTElement union = text | shape | line | image；删除 latex/chart/table/video/
 | 日期 | 内容 |
 |---|---|
 | 2026-08-11 | 初版：依据 Phase 4.1 完成后的讲解整理输出 |
+
+| 日期 | 内容 |
+|---|---|
+| 2026-08-11（二） | 修复：激光光点外观——外层 dot div 去除背景色（此前方形底色在圆形 core 四角露出，观感为方块）；光点由圆形 core + 光圈 + 光晕构成，与原项目 rounded-full 圆形光点一致 |
+
+| 日期 | 内容 |
+|---|---|
+| 2026-08-11（三） | mock 补充 shape 元素（圆形徽章），slide 四类元素齐全；新增 client 回归断言 |

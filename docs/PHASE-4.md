@@ -55,3 +55,6 @@
 > 范围变更（2026-08-11，Phase 4.1）：教学动作新增 laser（激光笔）；slide 元素类型收敛为
 > text / shape / line / image 四类（latex / chart / table / video / code 的类型与实现已删除，
 > 含 katex 依赖）。详见 docs/PHASE-4.1.md。
+
+> 范围变更（2026-08-11，Phase 5）：测验无判分业务——无得分 / 无 AI 判分 / 无解析讲解；
+> 复盘仅「选择题显示对错、简答题显示参考答案」。详见 docs/PHASE-5.md。

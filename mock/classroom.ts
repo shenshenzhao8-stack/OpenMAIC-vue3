@@ -120,7 +120,21 @@ export const mockClassroomScenes: Scene[] = [
             src: leafSvgDataUri,
           },
           {
-            // 线条箭头：从标题下方指向图片（start/end 为画布绝对坐标，left/top 置 0）
+            // 形状：圆形徽章（演示 shape 元素渲染；路径为 1000×1000 viewBox 中的圆）
+            id: 'shape_circle',
+            type: 'shape',
+            left: 850,
+            top: 60,
+            width: 80,
+            height: 80,
+            rotate: 0,
+            viewBox: [1000, 1000],
+            path: 'M500 0 A500 500 0 1 1 499 0 Z',
+            fixedRatio: true,
+            fill: '#ed7d31',
+          },
+          {
+            // 线条箭头：从标题下方指向图片（start/end 为画布绝对坐标，left/top 置 0）}s
             id: 'line_arrow',
             type: 'line',
             left: 0,
@@ -156,8 +170,6 @@ export const mockClassroomScenes: Scene[] = [
             { label: '细胞核', value: 'C' },
           ],
           answer: ['B'],
-          analysis: '光合作用发生在叶绿体中。',
-          points: 1,
         },
         {
           id: 'q2',
@@ -169,15 +181,12 @@ export const mockClassroomScenes: Scene[] = [
             { label: '葡萄糖', value: 'C' },
           ],
           answer: ['A', 'B'],
-          analysis: '光反应产物是 ATP、NADPH 和 O2。',
-          points: 2,
         },
         {
           id: 'q3',
           type: 'short_answer',
           question: '暗反应发生在叶绿体的哪个部位？',
-          commentPrompt: '考查暗反应场所（基质）。',
-          points: 2,
+          answer: ['叶绿体基质'],
         },
       ],
     },

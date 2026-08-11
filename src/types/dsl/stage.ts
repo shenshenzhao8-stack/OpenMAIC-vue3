@@ -7,7 +7,8 @@
  *   1. `SceneType` 只保留 slide / quiz / interactive 三种，删除 pbl（需求 1）；
  *   2. `SceneCore.multiAgent` 字段删除：本裁剪范围的互动由 ChatSession（会话）承载，
  *      不需要原项目的白板/讨论多智能体配置；
- *   3. `Stage` 保留全部常用字段，供播放引擎与 mock 使用。
+ *   3. `QuizQuestion` 裁剪判分/讲解字段（2026-08-11）：删除 points / analysis /
+ *      commentPrompt / hasAnswer——本项目无判分业务，复盘仅展示对错与参考答案。
  *
  * 保留的关键机制：
  *   - `Scene` 的泛型判别联合：`type` 与 `content` 强绑定（slide 场景必须携带
@@ -87,22 +88,14 @@ export interface QuizOption {
   value: string
 }
 
-/** 测验题目（原项目 QuizQuestion） */
+/** 测验题目（裁剪版：无判分/讲解字段） */
 export interface QuizQuestion {
   id: string
   type: 'single' | 'multiple' | 'short_answer'
   question: string
   options?: QuizOption[]
-  /** 正确答案：单选 ["A"]，多选 ["A","C"]，简答题无 */
+  /** 正确答案（选择题）或参考答案（简答题）；简答题展示在复盘页 */
   answer?: string[]
-  /** 判分后展示的解析 */
-  analysis?: string
-  /** 简答题 AI 判分的引导语 */
-  commentPrompt?: string
-  /** 是否可自动判分 */
-  hasAnswer?: boolean
-  /** 分值，默认 1 */
-  points?: number
 }
 
 /** 测验场景内容（原项目 QuizContent） */

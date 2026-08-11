@@ -50,7 +50,6 @@ watch(
 const dotStyle = computed(() => ({
   left: `${entered.value && geometry.value ? geometry.value.centerX : startX.value}%`,
   top: `${entered.value && geometry.value ? geometry.value.centerY : startY.value}%`,
-  backgroundColor: color.value,
   opacity: entered.value ? 1 : 0,
   transition:
     'left 500ms cubic-bezier(0.22,1,0.36,1), top 500ms cubic-bezier(0.22,1,0.36,1), opacity 150ms ease-out',

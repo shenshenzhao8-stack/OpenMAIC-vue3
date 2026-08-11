@@ -7,6 +7,7 @@ OpenMAIC（开源多智能体互动课堂平台）的 Vue 3 复刻版。
 - 场景：slide / quiz / interactive 三种；
 - 教学动作：speech（讲解）+ spotlight（聚光）+ laser（激光笔）；
 - slide 元素类型：仅 text / shape / line / image 四类；
+- 测验：无判分业务（选择题复盘显示对错、简答题显示参考答案）；
 - 页面：只有首页（课堂入口）与课堂播放页 `/classroom/:id`，**无生成页 / 生成预览页**，主业务在课堂播放；
 - 课堂数据：由 mock 提供（`mock/classroom.ts`），不做生成流程；
 - 互动：仅登录用户与老师两个角色，一问一答、可多轮（用户连续提问，对话历史累积），无多角色讨论；播放引擎调度、语音文字同步与学生提问互动：逻辑与原项目一致；
@@ -24,4 +25,5 @@ OpenMAIC 项目根目录的 `AGENTS.md`，本仓库不再单独复制规则文�
 - [x] Phase 2：mock 课堂数据 + 接口层（课堂页可加载数据）
 - [x] Phase 3：页面框架 / 课堂外壳（播放控制/翻页/场景分发）
 - [x] Phase 4：Slide 渲染器（画布/元素/聚光）
-- [ ] 后续阶段（quiz/interactive 渲染、语音同步、互动闭环）
+- [x] Phase 5：Quiz 场景（无判分）
+- [ ] 后续阶段（interactive 渲染、语音同步、互动闭环）

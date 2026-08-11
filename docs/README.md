@@ -50,3 +50,6 @@
 
 - [PHASE-4.1.md](./PHASE-4.1.md)：laser 激光笔 + slide 元素收敛四类
 - [REFERENCE-PHASE-4.1.md](./REFERENCE-PHASE-4.1.md)：Phase 4.1 工作参考手册（逐文件/逐方法业务讲解）
+
+- [PHASE-5.md](./PHASE-5.md)：Quiz 场景（无判分）
+- [REFERENCE-PHASE-5.md](./REFERENCE-PHASE-5.md)：Phase 5 工作参考手册（逐文件/逐方法业务讲解）

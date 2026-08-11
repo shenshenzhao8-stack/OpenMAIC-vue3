@@ -75,7 +75,6 @@ describe('自建类型模块（@openmaic/dsl 别名解析）', () => {
             question: '光合作用的场所是？',
             options: [{ label: '叶绿体', value: 'A' }],
             answer: ['A'],
-            points: 1,
           },
         ],
       },
