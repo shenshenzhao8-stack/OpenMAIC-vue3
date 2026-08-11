@@ -12,8 +12,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { Scene } from '@/types/stage'
-import { useViewportSize } from '@/composables/useViewportSize'
-import { useSlideBackgroundStyle } from '@/composables/useSlideBackgroundStyle'
+import { useViewportSize } from '@/hooks/useViewportSize'
+import { useSlideBackgroundStyle } from '@/hooks/useSlideBackgroundStyle'
 import ScreenElement from './ScreenElement.vue'
 import SpotlightOverlay from './SpotlightOverlay.vue'
 import LaserOverlay from './LaserOverlay.vue'
@@ -23,7 +23,7 @@ const props = defineProps<{ scene: Scene | null }>()
 // 仅 slide 场景有 canvas
 const slide = computed(() => (props.scene?.type === 'slide' ? props.scene.content.canvas : null))
 
-// 容器 ref（绑定模板），交给视口自适应 composable 测量
+// 容器 ref（绑定模板），交给视口自适应 hook（组合式函数） 测量
 const containerRef = ref<HTMLElement | null>(null)
 const { fit } = useViewportSize(containerRef)
 const { backgroundStyle } = useSlideBackgroundStyle(computed(() => slide.value?.background))

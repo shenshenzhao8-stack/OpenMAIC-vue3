@@ -1,5 +1,5 @@
 /**
- * 文件头：幻灯片视口自适应 composable
+ * 文件头：幻灯片视口自适应 hook（组合式函数）
  *
  * 对应原项目：packages/@openmaic/renderer/src/hooks/useViewportSize.ts
  *
@@ -11,7 +11,7 @@ import { ref, computed, onMounted, onBeforeUnmount, type Ref, type ComputedRef }
 import { computeSlideViewportFit, type SlideViewportFit } from '@/utils/viewport-fit'
 
 export interface UseViewportSizeResult {
-  /** 容器 ref（未传入外部 ref 时由本 composable 自建） */
+  /** 容器 ref（未传入外部 ref 时由本 hook（组合式函数） 自建） */
   containerRef: Ref<HTMLElement | null>
   /** 视口适配结果（响应式） */
   fit: ComputedRef<SlideViewportFit>

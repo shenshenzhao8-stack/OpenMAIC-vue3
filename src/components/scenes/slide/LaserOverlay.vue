@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { useCanvasStore } from '@/stores/canvas'
-import { useScene } from '@/composables/useScene'
+import { useScene } from '@/hooks/useScene'
 import { findElementGeometry } from '@/utils/geometry'
 
 const canvasStore = useCanvasStore()
