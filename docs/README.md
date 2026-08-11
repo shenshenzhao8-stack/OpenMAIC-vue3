@@ -56,3 +56,5 @@
 
 - [PHASE-6.md](./PHASE-6.md)：Interactive 场景（iframe 安全渲染 + 保活池）
 - [REFERENCE-PHASE-6.md](./REFERENCE-PHASE-6.md)：Phase 6 工作参考手册（逐文件/逐方法业务讲解）
+
+- [MIGRATION-GUIDE.md](./MIGRATION-GUIDE.md)：迁移到另一个 Vue3 项目的说明与注意事项

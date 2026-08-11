@@ -1,5 +1,5 @@
 /**
- * 文件头：幻灯片背景样式 hook（组合式函数）
+ * 文件头：幻灯片背景样式 composable（组合式函数）
  *
  * 对应原项目：lib/hooks/use-slide-background-style.ts
  *

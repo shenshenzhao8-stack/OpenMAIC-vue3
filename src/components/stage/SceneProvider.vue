@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { computed, provide } from 'vue'
 import { useStageStore } from '@/stores/stage'
-import { SceneKey } from '@/hooks/useScene'
+import { SceneKey } from '@/composables/useScene'
 
 const stageStore = useStageStore()
 

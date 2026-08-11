@@ -1,5 +1,5 @@
 /**
- * 文件头：播放引擎接线 hook（组合式函数）
+ * 文件头：播放引擎接线 composable（组合式函数）
  *
  * 对应原项目：components/edit/PlaybackChromeRoot.tsx（创建 PlaybackEngine/ActionEngine/
  * AudioPlayer 并接回调）与 components/stage.tsx（播放/编辑模式分发，本项目仅播放）。

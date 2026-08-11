@@ -19,11 +19,11 @@
 容器相对偏高（height/width > 0.5625）→ 按宽度适配（上下留黑边）；否则按高度适配（左右留黑边）；
 返回画布框像素尺寸、居中偏移与缩放比。逻辑与原项目 useViewportSize 完全一致。
 
-## 3. `src/hooks/useSlideBackgroundStyle.ts`
+## 3. `src/composables/useSlideBackgroundStyle.ts`
 
 computed 包装 `resolveSlideBackgroundStyle`，输入响应式背景数据，输出响应式 CSS。
 
-## 4. `src/hooks/useViewportSize.ts`
+## 4. `src/composables/useViewportSize.ts`
 
 - 测量容器（`clientWidth/Height`）；
 - `ResizeObserver` 监听窗口/容器变化自动重算；

@@ -65,7 +65,7 @@ openmaic-vue3/
 │  │  └─ logger.ts
 │  ├─ stores/                # Pinia：stage/canvas/settings/agent-registry
 │  ├─ api/                   # 统一接口层 + mock（chat-sse/tts/quiz-grade）
-│  ├─ hooks/           # Phase 3+：usePlaybackEngine/useChatSession 等
+│  ├─ composables/           # Phase 3+：usePlaybackEngine/useChatSession 等
 │  ├─ components/            # Phase 3+：stage/scenes/chat 等
 │  ├─ pages/                 # HomePage / ClassroomPage
 │  └─ router/
@@ -128,7 +128,7 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
   1. `SceneRenderer.vue`：按 `scene.type` 分发到三种渲染组件（slide/quiz/interactive 先占位）；
   2. `SceneProvider`（provide/inject）：把当前场景数据提供给子组件；
   3. 播放器外壳：场景侧边栏 + 顶栏（上一页/下一页/播放/暂停）；
-  4. `usePlaybackEngine` hook（组合式函数）：把 PlaybackEngine 回调接到 Vue 响应式状态；
+  4. `usePlaybackEngine` composable（组合式函数）：把 PlaybackEngine 回调接到 Vue 响应式状态；
   5. （可选）播放位置持久化（T-10，localStorage）。
 - 原项目文件对照：
   - `app/classroom/[id]/page.tsx`（课堂页接线）
@@ -149,7 +149,7 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
   2. `useViewportSize`（量容器→算 fitScale→居中）；
   3. `ScreenElement.vue` + 元素组件（text/image/shape/latex/chart 优先，其余后补）；
   4. `SpotlightOverlay.vue`（DOM 测量 + SVG mask 聚光，5 秒自动熄灭）；
-  5. 背景样式 hook（组合式函数）。
+  5. 背景样式 composable（组合式函数）。
 - 原项目文件对照：
   - `packages/@openmaic/renderer/src/SlideCanvas.tsx`、`hooks/useViewportSize.ts`
   - `lib/hooks/use-slide-background-style.ts`、`lib/utils/geometry.ts`
@@ -185,17 +185,17 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 - 需求规划：
   1. 播放主路径：`AudioPlayer.play(audioId/audioUrl)` 直接播后台音频（T-01 若后台自带音频）；
   2. 无音频兜底：朗读计时（timing.ts 已搬）+ 浏览器 TTS；
-  3. `useDiscussionTTS` hook（组合式函数）（React→Vue）：语音队列 + 封口入队 + shouldHold；
+  3. `useDiscussionTTS` composable（组合式函数）（React→Vue）：语音队列 + 封口入队 + shouldHold；
   4. 字幕接线：`onSpeechStart` → 逐字揭示；`segmentDone` 放行。
 - 原项目文件对照：`engine.ts`（已搬）、`audio-player.ts`（已搬）、`timing.ts`（已搬）、
-  `lib/hooks/use-discussion-tts.ts`（改写 hook（组合式函数））、`stream-buffer.ts`（已搬）。
+  `lib/hooks/use-discussion-tts.ts`（改写 composable（组合式函数））、`stream-buffer.ts`（已搬）。
 - 验收：播放时字幕逐字出现、音频播完才进下一句、聚光穿插在句间；暂停/恢复/倍速可用。
 
 ### Phase 8 · 互动闭环（登录用户 ↔ 老师多轮问答）
 
 - 目标：课堂中随时提问 → 打断讲课 → 老师回答 → 恢复讲课；支持多轮。
 - 需求规划：
-  1. `useChatSession` hook（组合式函数）（改写自 `use-chat-sessions.ts`）：sendMessage、
+  1. `useChatSession` composable（组合式函数）（改写自 `use-chat-sessions.ts`）：sendMessage、
      SSE→buffer 翻译器、打断补"..."；
   2. `ChatArea.vue` 消息气泡 + 输入框；
   3. 引擎接线：`handleUserInterrupt`（打断→live）、`handleEndDiscussion`（恢复）；

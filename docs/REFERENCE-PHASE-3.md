@@ -13,7 +13,7 @@ next/previous 逻辑（原项目是直接改 store 的方法，本项目抽成�
 | `getAdjacentSceneId(scenes, currentId, direction)` | 按当前 id 找相邻场景 id；首/尾越界或找不到返回 null | 页面组件调用后写入 stage store（翻页唯一入口） |
 | `getFirstSceneId(scenes)` | 返回第一个场景 id | 进入课堂默认显示第一页 |
 
-## 2. `src/hooks/useScene.ts` —— 场景上下文（provide/inject）
+## 2. `src/composables/useScene.ts` —— 场景上下文（provide/inject）
 
 **文件作用**：定义场景上下文的 key 与注入函数，对应原项目 React Context 的
 useSceneSelector。Vue 用 `Symbol` 作 InjectionKey，避免跨树冲突。
@@ -38,7 +38,7 @@ useSceneSelector。Vue 用 `Symbol` 作 InjectionKey，避免跨树冲突。
 **作用**：让分发链路先可用（显示场景标题 + 数量提示），Phase 4/5/6 逐个替换为真实渲染器。
 占位组件接收 `Scene | null`，内部判空，避免模板类型收窄问题。
 
-## 8. `src/hooks/usePlaybackEngine.ts` —— 播放引擎接线
+## 8. `src/composables/usePlaybackEngine.ts` —— 播放引擎接线
 
 **文件作用**：把纯 TS 的 PlaybackEngine 接到 Vue 响应式状态，对应原项目
 PlaybackChromeRoot 的引擎创建与回调接线。

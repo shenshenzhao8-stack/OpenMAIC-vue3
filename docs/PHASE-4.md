@@ -21,9 +21,9 @@
 | 新工程文件 | 原项目文件 | 原文件功能 | 实现方式与原因 |
 |---|---|---|---|
 | `src/utils/slide-style.ts` | `lib/hooks/use-slide-background-style.ts`、`useElementShadow.ts`、`useFilter.ts` | 背景/阴影/滤镜 → CSS | **改写（抽纯函数）**：逻辑一致，便于测试 |
-| `src/utils/viewport-fit.ts` | `packages/@openmaic/renderer/src/hooks/useViewportSize.ts` | 量容器→算适配 | **改写（抽纯算法）**：逻辑一致（偏高按宽度、偏宽按高度） |
-| `src/hooks/useSlideBackgroundStyle.ts` | `lib/hooks/use-slide-background-style.ts` | 背景响应式样式 | **改写**：computed 包装纯函数 |
-| `src/hooks/useViewportSize.ts` | `packages/@openmaic/renderer/src/hooks/useViewportSize.ts` | 容器测量 + ResizeObserver | **改写**：支持外部传入容器 ref |
+| `src/utils/viewport-fit.ts` | `packages/@openmaic/renderer/src/composables/useViewportSize.ts` | 量容器→算适配 | **改写（抽纯算法）**：逻辑一致（偏高按宽度、偏宽按高度） |
+| `src/composables/useSlideBackgroundStyle.ts` | `lib/hooks/use-slide-background-style.ts` | 背景响应式样式 | **改写**：computed 包装纯函数 |
+| `src/composables/useViewportSize.ts` | `packages/@openmaic/renderer/src/composables/useViewportSize.ts` | 容器测量 + ResizeObserver | **改写**：支持外部传入容器 ref |
 | `src/components/scenes/slide/SlideView.vue` | `packages/@openmaic/renderer/src/SlideCanvas.tsx` | 画布渲染（背景/内容层/特效层） | **改写**：结构照抄（容器→画布框→背景→1000×562.5 内容层→聚光） |
 | `src/components/scenes/slide/ScreenElement.vue` | `components/slide-renderer/Editor/ScreenElement.tsx` | 元素分发 + 定位 + id 约定 | **改写**：id 固定 `screen-element-{id}`（聚光定位依赖） |
 | `elements/TextElement.vue` | `.../TextElement/BaseTextElement.tsx` | 文本渲染（v-html） | **改写**：样式字段一致 |
