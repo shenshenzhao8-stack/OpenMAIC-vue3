@@ -1,9 +1,9 @@
 {
-  "name": "openmaic-vue3",
+  "name": "@ailearning/openmaic",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "OpenMAIC 的 Vue 3 复刻版（裁剪范围：slide/quiz/interactive 三种场景 + speech/spotlight 两种教学动作）",
+  "description": "OpenMAIC 课堂播放器（Vue 3；slide/quiz/interactive + speech/spotlight/laser；独立 SPA 与可嵌入组件双形态）",
   "main": "./src/index.ts",
   "exports": {
     ".": {
@@ -19,10 +19,11 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests",
+    "clear": "rm -fr node_modules && rm -fr dist"
   },
   "dependencies": {
-    "pinia": "^3.0.4",
+    "pinia": "~2.1.7",
     "vue": "^3.5.41",
     "vue-router": "^4.6.4"
   },

@@ -27,6 +27,7 @@
 | `vite.config.ts` / `vitest.config.ts` / `tsconfig.json` | 构建/类型配置（含 `#/*` 与 `@openmaic/dsl` alias） |
 | `package.json` | 改造后（见 2.3） |
 | `README.md` / `TODO.md` / `docs/` | 项目文档与全部 PHASE/REFERENCE/MONOREPO 记录 |
+| `AGENTS.md`（新增） | 复刻任务包级规则（2026-08-12 由 `/Users/mac/OpenMAIC/AGENTS.md` 同步并适配 monorepo 形态） |
 
 ### 2.2 未迁移（排除）
 
@@ -95,3 +96,14 @@
 Web 最小接入：`router-v2` 独立布局 + `views/ai-classroom` 包装页 + workspace 依赖
 `@ailearning/openmaic: workspace:^` + `@openmaic/dsl` Web alias + 音频资源供应 + iframe
 Teleport 联调验证。
+
+## 十、Phase 5 补充：测试文件清理与测试策略（2026-08-12）
+
+按用户要求（目标仓库无 vitest 体系），清理包内历史测试文件：
+
+- 删除 18 个 `*.test.ts` 与空 `__tests__` 目录（清单见本记录执行过程）；
+- `package.json` test 脚本改为 `vitest run --passWithNoTests`（正式库无测试文件不报错）；
+- `vitest.config.ts` 与 vitest 依赖保留：开发时临时放 `*.test.ts` 验证后删除；
+- 该策略已写入 `package-openmaic/AGENTS.md` 规则七；
+- 回归防线调整：typecheck + build + 固定主线人工回归（原 80 用例的验证价值由开发期
+  临时测试与人工回归承接）。
