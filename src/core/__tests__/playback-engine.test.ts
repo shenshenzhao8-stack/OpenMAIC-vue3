@@ -169,3 +169,130 @@ describe('PlaybackEngine（激光笔）', () => {
     expect(engine.getMode()).toBe('idle')
   })
 })
+
+describe('PlaybackEngine（Phase 9 边界测试：暂停/恢复/跳转/打断）', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('pause 后进入 paused，resume 恢复并继续播完', async () => {
+    const scene = makeSlideScene('sc1', 1, [
+      { id: 'a1', type: 'speech', text: '第一句' },
+      { id: 'a2', type: 'speech', text: '第二句' },
+    ])
+    const audioPlayer = new MockAudioPlayer()
+    const engine = new PlaybackEngine([scene], new ActionEngine(audioPlayer), audioPlayer, {
+      onComplete: () => {},
+      getPlaybackSpeed: () => 1,
+      isAgentSelected: () => true,
+    })
+
+    engine.start()
+    expect(engine.getMode()).toBe('playing')
+    // 暂停：播放中 → paused
+    engine.pause()
+    expect(engine.getMode()).toBe('paused')
+    // 恢复：paused → playing，并继续推进直到播完
+    engine.resume()
+    expect(engine.getMode()).toBe('playing')
+    await flush()
+    expect(engine.getMode()).toBe('idle')
+    expect(engine.isExhausted()).toBe(true)
+  })
+
+  it('jumpToAction 跳转到目标动作（onProgress 更新游标）并自动播放', async () => {
+    const scene = makeSlideScene('sc1', 1, [
+      { id: 'a1', type: 'speech', text: '第一句' },
+      { id: 'a2', type: 'spotlight', elementId: 'img_1', dimOpacity: 0.5 },
+      { id: 'a3', type: 'speech', text: '第三句' },
+    ])
+    const audioPlayer = new MockAudioPlayer()
+    const actionEngine = new ActionEngine(audioPlayer)
+    const progress: number[] = []
+    const events: string[] = []
+    const engine = new PlaybackEngine([scene], actionEngine, audioPlayer, {
+      onProgress: (snapshot) => progress.push(snapshot.actionIndex),
+      onSpeechStart: (text) => events.push(`speech:${text}`),
+      onComplete: () => events.push('complete'),
+      getPlaybackSpeed: () => 1,
+      isAgentSelected: () => true,
+    })
+
+    // idle 状态直接跳到动作 2（第三句），autoplay 从该处继续
+    await expect(engine.jumpToAction(2, { autoplay: true })).resolves.toBe(true)
+    expect(progress[progress.length - 1]).toBe(2)
+    await flush()
+    expect(events).toEqual(['speech:第三句', 'complete'])
+  })
+
+  it('live 模式（讨论中）禁止跳转', async () => {
+    const scene = makeSlideScene('sc1', 1, [
+      { id: 'a1', type: 'speech', text: '第一句' },
+      { id: 'a2', type: 'speech', text: '第二句' },
+    ])
+    const audioPlayer = new MockAudioPlayer()
+    const engine = new PlaybackEngine([scene], new ActionEngine(audioPlayer), audioPlayer, {
+      onComplete: () => {},
+      getPlaybackSpeed: () => 1,
+      isAgentSelected: () => true,
+    })
+
+    engine.start()
+    engine.handleUserInterrupt('老师，我有一个问题')
+    expect(engine.getMode()).toBe('live')
+    expect(engine.canJumpToAction(0)).toBe(false)
+    await expect(engine.jumpToAction(0)).resolves.toBe(false)
+  })
+
+  it('播放中提问打断保存位置，endDiscussion 后 continuePlayback 恢复被打断句', async () => {
+    const scene = makeSlideScene('sc1', 1, [
+      { id: 'a1', type: 'speech', text: '第一句' },
+      { id: 'a2', type: 'speech', text: '第二句' },
+      { id: 'a3', type: 'speech', text: '第三句' },
+    ])
+    const audioPlayer = new MockAudioPlayer()
+    const events: string[] = []
+    const engine = new PlaybackEngine([scene], new ActionEngine(audioPlayer), audioPlayer, {
+      onSpeechStart: (text) => events.push(`speech:${text}`),
+      onComplete: () => {},
+      getPlaybackSpeed: () => 1,
+      isAgentSelected: () => true,
+    })
+
+    // 第一句刚开始就打断：保存位置回到第一句，进入 live
+    engine.start()
+    engine.handleUserInterrupt('问题')
+    expect(engine.getMode()).toBe('live')
+    engine.handleEndDiscussion()
+    expect(engine.getMode()).toBe('idle')
+    // endDiscussion 已把保存位置恢复到引擎游标（并清空标志），
+    // 快照应指向被打断的第一句
+    expect(engine.getSnapshot().actionIndex).toBe(0)
+
+    // 继续播放：从被打断的第一句重播
+    engine.continuePlayback()
+    await flush()
+    expect(events).toContain('speech:第一句')
+  })
+
+  it('live 模式 pause 挂起讨论（paused + pending），resume 恢复 live', async () => {
+    const scene = makeSlideScene('sc1', 1, [
+      { id: 'a1', type: 'speech', text: '第一句' },
+    ])
+    const audioPlayer = new MockAudioPlayer()
+    const engine = new PlaybackEngine([scene], new ActionEngine(audioPlayer), audioPlayer, {
+      onComplete: () => {},
+      getPlaybackSpeed: () => 1,
+      isAgentSelected: () => true,
+    })
+
+    engine.start()
+    engine.handleUserInterrupt('问题')
+    // 讨论中暂停 → 讨论挂起（paused + pending）
+    engine.pause()
+    expect(engine.getMode()).toBe('paused')
+    // 恢复 → 回到 live 讨论
+    engine.resume()
+    expect(engine.getMode()).toBe('live')
+  })
+})

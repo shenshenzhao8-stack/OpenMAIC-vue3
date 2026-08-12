@@ -271,3 +271,43 @@ UI 层无需改动（`supported` 由检测函数返回）。
 
 T-18 / T-19 是否在下一版本补回（建议补回，工作量小、收益明确：讲义视图可直接照搬纯函数，
 进度条可复用引擎已实现的 jumpToAction）。补回方案按规则六执行并输出对应文档。
+
+## 十一、验收素材扩充记录（2026-08-12）
+
+### 背景
+
+用户验收全流程时需要更丰富的逐字稿（speech 文本更长、段数更多）与更多教学动作，
+原 mock 只有 5 段单句 speech 与少量 spotlight/laser。本次仅做**数据扩充**，不改任何旧数据。
+
+### 新增内容（全部为追加，旧数据 0 改动）
+
+| 场景 | 类型 | 内容 | 动作 |
+|---|---|---|---|
+| `scene-slide-3` 光反应：类囊体薄膜（order 5） | slide | 标题/叶绿体图/类囊体形状/反应要点/箭头，元素仅 text/image/shape/line | s1-s5 五段长逐字稿 + 3 个 spotlight + 2 个 laser |
+| `scene-slide-4` 暗反应：叶绿体基质（order 6） | slide | 标题/基质图/卡尔文循环要点/箭头/装饰形状 | s6-s9 四段长逐字稿 + 2 个 spotlight + 2 个 laser |
+| `scene-quiz-2` 随堂测验（进阶）（order 7） | quiz | 单选×2 + 多选×1 + 简答×1（含参考答案，无判分） | s10/s11 两段引导 speech |
+| `scene-interactive-2` CO₂ 浓度模拟（order 8） | interactive | iframe 滑块模拟实验（CO₂ 浓度 → 光合速率） | s12 一段引导 speech |
+
+新增 speech 共 12 段，音频 `/audio/s1.mp3 ~ s12.mp3`（每段 8~15 秒，明显长于旧数据；
+由 macOS 语音合成生成，**文本与语音一一对应**，可验收字幕逐字与语音文字同步）。
+
+### 数据保全验证
+
+- `git diff mock/classroom.ts`：387 行**纯新增**，无删除、无修改；旧场景（slide-1 / quiz-1 /
+  interactive-1 / slide-2）与旧动作（a1/a4/b1/c1/d1/d2）原样保留；
+- `public/audio/`：旧 5 个 mp3 未动，仅新增 s1~s12.mp3；
+- 测试断言（每种场景存在、动作白名单、slide 元素四类、每个 speech 带 mp3）全部通过。
+
+### 验收路径建议（供用户按此点验）
+
+1. 进入 `/classroom/demo`，按场景顺序播放：slide-1 → quiz-1 → interactive-1 → slide-2 →
+   **slide-3（光反应长讲解）→ slide-4（暗反应长讲解）→ quiz-2（进阶测验）→ interactive-2（CO₂ 模拟）**；
+2. 长逐字稿场景重点验收：字幕逐字揭示、语音与文字同步、聚光/激光与讲解穿插、暂停/恢复精确续播、
+   倍速切换实时生效；
+3. quiz-2 验收：作答 → 复盘（选择题对错、简答题参考答案）；
+4. interactive-2 验收：iframe 渲染、滑块交互、切走再切回保活；
+5. 全程任一时刻可提问：播放中打断 → 老师回答 → 继续讲课恢复原位置（问答多轮）。
+
+### 验证结果
+
+`vue-tsc --noEmit`、vitest 15 文件 / 66 用例、`npm run build` 全部通过。

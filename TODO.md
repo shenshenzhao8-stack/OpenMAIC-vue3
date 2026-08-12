@@ -21,8 +21,6 @@
 | T-14 | 音频粒度：后台音频是「每句一个文件」还是「整段/整页一个文件」 | 假设每句一个（与 speech action 的 audioId/audioUrl 一一对应） | Phase 7、`src/core/playback/engine.ts` | 后台数据结构确认 | 若整段：需「音频时间轴 ↔ 句子」对齐切分逻辑 |
 | T-15 | 倍速 / 暂停 / 恢复 / 打断重讲与后台音频格式是否兼容 | 引擎已按原项目实现；倍速 UI 已落地（Phase 7）；暂停/恢复精确续播与按场景播放已修复（2026-08-12） | Phase 3/7/8 | 真实验收 | 联调时逐项验证；若后台音频不支持倍速，需 `playbackRate` 降级方案 |
 | T-16 | 多角色讨论移除（2026-08-07 范围调整）：互动仅「登录用户 ↔ 老师」一问一答、可多轮 | 互动已实现（Phase 8）：每轮一次一问一答，历史逐轮累积；无圆桌/多角色 | Phase 1 已调整、Phase 8 落实 | 用户确认 | 若将来要恢复多角色：恢复导演多 agent 编排、圆桌组件与 discussion 动作 |
-| T-18 | **功能丢失（2026-08-12 审查发现）：讲义视图（Lecture Notes）缺失**——原项目聊天区为「讲义（lecture）+ 对话（chat）」双 tab 且默认讲义页，由 `lib/chat/lecture-notes.ts` 的 `buildLectureNotes(scenes)` 纯函数生成讲义条目（speech/spotlight/laser 等动作），`components/chat/lecture-notes-view.tsx` 渲染 | 新工程 ChatArea 仅问答面板，无讲义 tab；文档此前无裁剪记录，属**无意识丢失** | 待补：`src/utils/lecture-notes.ts`（照搬纯函数）+ `ChatArea.vue` 讲义 tab + 讲义渲染 | 验收发现（2026-08-12 功能保留审查） | 按规则六补回：先照搬 `buildLectureNotes`（纯函数，适配本项目 action 类型），再在 ChatArea 增加 lecture/chat 双 tab；完成前在「已落实」登记关闭 |
-| T-19 | **功能丢失（2026-08-12 审查发现）：播放进度未接线**——引擎 `PlaybackEngineCallbacks.onProgress` 已支持（types.ts:88）但 `usePlaybackEngine` 未接；`jumpToAction` / `canJumpToAction` 引擎已实现但未暴露给任何 UI，无进度跳转 | 新工程顶栏只有播放/暂停/停止/翻页/倍速，无进度指示与进度跳转；其中「位置持久化（刷新恢复）」已由 T-10 记录 | 待补：`usePlaybackEngine` 接 `onProgress` 暴露 `currentActionIndex/total`；顶栏或字幕条加进度条（可点跳转调 `jumpToAction`） | 验收发现（2026-08-12 功能保留审查） | 按规则六补接：onProgress 更新响应式进度状态；UI 进度条点击 → `jumpToAction`；位置持久化另行按 T-10 决策 |
 
 ## 已落实 / 已关闭条目
 
@@ -35,3 +33,6 @@
 | T-08 | 已落实（2026-08-11） | 按需求裁剪判分业务：无得分 / 无 AI 判分；client.gradeQuiz、quiz-grade mock、grading.ts 已删除；复盘仅选择题对错 + 简答题参考答案（见 docs/PHASE-5.md） |
 | T-04 | 已落实（2026-08-12） | 麦克风语音输入（STT）已实现：`useSpeechRecognition`（Web Speech API + getUserMedia 权限预检，对齐原项目 PromptInputSpeechButton 与设置页 asr-settings.tsx）+ 能力检测 / 错误分类（含非安全上下文与环境不支持）/ 具体错误名透出 / 重试（含 requesting 反馈）/ 音量指示；final 片段追加输入框走普通文本通道（见 docs/PHASE-8.md「八、功能补充记录」「九、问题修复记录」） |
 | T-18/T-19 | 已定位待补（2026-08-12） | 功能保留审查确认两处无意识丢失（讲义视图、onProgress/进度跳转），已登记上表待补；根因与处置见 docs/PHASE-8.md「十、功能保留审查记录」与 AGENTS.md 规则六 |
+| T-20 | 已落实（2026-08-12） | 验收素材扩充：新增 scene-slide-3（光反应）/ scene-slide-4（暗反应）/ scene-quiz-2（进阶测验）/ scene-interactive-2（CO₂ 模拟）共 8 场景、12 段长逐字稿（8~15 秒 mp3，文本语音一致）、10 个 spotlight/laser；旧数据 0 改动（见 docs/PHASE-8.md「十一、验收素材扩充记录」） |
+| T-18 | 已落实（2026-08-12，Phase 9） | 讲义视图补回：`src/utils/lecture-notes.ts`（照搬 buildLectureNotes，动作类型收敛为 speech/spotlight/laser）+ ChatArea 讲义/问答双 tab（默认讲义），讲义行点击跳转（见 docs/PHASE-9.md 第三节） |
+| T-19 | 已落实（2026-08-12，Phase 9） | 播放进度接线补回：onProgress → currentActionIndex；顶栏分格进度条点击 → jumpToAction（见 docs/PHASE-9.md 第三节）；顺带修复「讨论结束后恢复从头播」bug（第五节） |

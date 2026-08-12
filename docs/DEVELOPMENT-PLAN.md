@@ -215,15 +215,18 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
   权限预检可拉起浏览器授权弹窗、识别结果进入输入框、音量指示可用；T-03 确认 SSE 是否带音频后
   决定语音实现。
 
-### Phase 9 · 打磨与验收
+### Phase 9 · 打磨与验收 ✅ 已完成（2026-08-12）
 
 - 目标：补齐边界测试与体验细节，输出验收清单。
-- 内容：
-  1. 引擎边界测试（pause/resume、跳转、打断、讨论分支休眠验证）；
-  2. 加载/错误/空态；移动端基础适配；
-  3. Playwright 冒烟（可选）：进入课堂 → 播放 → 提问 → 回答；
-  4. README 使用说明 + mock 接口清单 + 如何切真实后端；
-  5. 对照需求清单逐项验收（见下节）。
+- 内容（已交付）：
+  1. T-18 讲义视图补回（`src/utils/lecture-notes.ts` 照搬 + ChatArea 双 tab）；
+  2. T-19 播放进度接线补回（onProgress → 进度条 → jumpToAction）；
+  3. 修复 Phase 8 遗留 bug：讨论结束后「播放」从头开始（endDiscussion 前缓存打断标志）；
+  4. 引擎边界测试（pause/resume、跳转、打断恢复、讨论休眠）；
+  5. 空态 / 错误态与移动端基础适配；
+  6. README 使用说明 + mock 接口清单 + 如何切真实后端；
+  7. 验收清单（见 PHASE-9.md 第九节）。
+- 验证：vue-tsc / vitest 16 文件 75 用例 / build 全部通过。
 
 ## 七、验收需求清单（最终标准）
 
@@ -273,6 +276,7 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 | 6 | Interactive 场景 | ✅ | 待人工审核后提交（规则五：未提交） |
 | 7 | 语音文字同步 | ✅ | 待人工审核后提交（规则五：未提交） |
 | 8 | 互动闭环 | ✅ | 待人工审核后提交（规则五：未提交） |
+| 9 | 打磨与验收（T-18/T-19 补回 + 边界测试 + 文档） | ✅ | 待人工审核后提交（规则五：未提交） |
 | 9 | 打磨验收 | ⏳ 下一步 | - |
 
 ### Phase 4.1 · laser 激光笔 + slide 元素收敛四类 ✅ 已完成（2026-08-11）

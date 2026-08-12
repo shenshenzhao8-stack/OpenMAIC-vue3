@@ -1,12 +1,15 @@
 <!--
   文件头：课堂播放页（课堂外壳）
   对应原项目：app/classroom/[id]/page.tsx（加载课堂）+ components/stage.tsx（舞台根）+ PlaybackChromeRoot（引擎接线）
-  功能（Phase 3-8）：
+  功能（Phase 3-9）：
     1. 加载 mock 课堂数据并写入 stage store；
     2. 课堂外壳：顶栏（课程信息 + 播放控制）、侧边栏（场景列表）、主区（场景渲染）、问答面板；
     3. 播放引擎接线 + 打断/恢复（Phase 8）：学生提问 → interrupt（保存位置进 live）→ 老师回答
        → 点「继续讲课」→ endDiscussion（恢复位置）；
-    4. 全局挂载 InteractiveIframeHost（交互 iframe 保活）。
+    4. 全局挂载 InteractiveIframeHost（交互 iframe 保活）；
+    5. Phase 9（T-19/T-18）：进度条跳转（HeaderControls onSeek → jumpToAction）、
+       讲义视图（ChatArea 双 tab，讲义行点击跳转）；
+    6. Phase 9：空态（无场景时提示）/ 错误态 / 移动端基础适配。
 -->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
@@ -31,10 +34,14 @@ const {
   mode,
   lectureSpeech,
   isLive,
+  currentActionIndex,
+  totalActions,
   play,
   pause,
   resume,
   stop,
+  jumpToAction,
+  canJumpToAction,
   interrupt,
   endDiscussion,
   nextScene,
@@ -77,6 +84,11 @@ function handleSend(text: string) {
 function handleContinue() {
   endDiscussion()
 }
+
+/** 进度条/讲义跳转：调用引擎 jumpToAction（内部校验 live 与可重建前缀） */
+function handleSeek(actionIndex: number) {
+  void jumpToAction(actionIndex)
+}
 </script>
 
 <template>
@@ -85,6 +97,10 @@ function handleContinue() {
     <p v-else-if="error" class="status error">{{ error }}</p>
 
     <template v-else>
+      <!-- 空态：课堂没有任何场景（mock 异常或后端空数据） -->
+      <p v-if="stageStore.scenes.length === 0" class="status">该课程暂无内容</p>
+
+      <template v-else>
       <header class="topbar">
         <div class="course">
           <h1>{{ stageStore.stage?.name }}</h1>
@@ -92,12 +108,15 @@ function handleContinue() {
         </div>
         <HeaderControls
           :mode="mode"
+          :current-action-index="currentActionIndex"
+          :total-actions="totalActions"
           :on-play="play"
           :on-pause="pause"
           :on-resume="resume"
           :on-stop="stop"
           :on-next="nextScene"
           :on-prev="prevScene"
+          :on-seek="handleSeek"
         />
       </header>
 
@@ -108,7 +127,7 @@ function handleContinue() {
             <SceneRenderer />
           </SceneProvider>
         </section>
-        <!-- 问答面板（登录用户 ↔ 老师） -->
+        <!-- 聊天面板：讲义（默认）/ 问答双 tab -->
         <ChatArea
           :messages="chatMessages"
           :is-streaming="chatStreaming"
@@ -116,12 +135,18 @@ function handleContinue() {
           :speaking-agent-id="chatSpeakingAgentId"
           :on-send="handleSend"
           :on-continue="handleContinue"
+          :scenes="stageStore.scenes"
+          :current-scene-id="stageStore.currentSceneId"
+          :current-action-index="currentActionIndex"
+          :can-jump-to-action="canJumpToAction"
+          :on-jump-to-action="handleSeek"
         />
       </div>
 
       <footer v-if="lectureSpeech" class="subtitle-bar">
         {{ lectureSpeech }}
       </footer>
+      </template>
     </template>
 
     <InteractiveIframeHost />
@@ -181,5 +206,17 @@ function handleContinue() {
   background: #1e293b;
   color: #f8fafc;
   font-size: 0.95rem;
+}
+@media (max-width: 900px) {
+  .topbar {
+    padding: 0.5rem 0.75rem;
+  }
+  .course p {
+    display: none;
+  }
+  .subtitle-bar {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.82rem;
+  }
 }
 </style>

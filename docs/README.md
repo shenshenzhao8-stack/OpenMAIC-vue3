@@ -64,3 +64,6 @@
 
 - [PHASE-8.md](./PHASE-8.md)：互动闭环（登录用户 ↔ 老师多轮一问一答）
 - [REFERENCE-PHASE-8.md](./REFERENCE-PHASE-8.md)：Phase 8 工作参考手册（逐文件/逐方法业务讲解）
+
+- [PHASE-9.md](./PHASE-9.md)：打磨与验收（讲义视图 + 进度跳转补回、边界测试、空态/移动端、文档）
+- [REFERENCE-PHASE-9.md](./REFERENCE-PHASE-9.md)：Phase 9 工作参考手册（逐文件/逐方法业务讲解）
