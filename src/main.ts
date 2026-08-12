@@ -12,7 +12,8 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
-import './styles.css'
+// 独立 SPA 专用根样式（含 html/body/#app 规则）；组件入口不得引入
+import './standalone.css'
 import router from './router'
 
 // 创建 Vue 应用实例

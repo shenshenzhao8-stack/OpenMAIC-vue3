@@ -1,0 +1,24 @@
+/**
+ * 独立应用专用根样式（仅由 src/main.ts 引入）
+ *
+ * 对应改造：MONOREPO-INTEGRATION-REFACTOR-PLAN.md Phase 3.1（全局样式拆分）
+ *
+ * 说明：这些规则会影响宿主 html/body/#app，因此只能由独立 SPA 入口引入；
+ * 包公开入口与 OpenMaicClassroom 组件一律不得 import 本文件，
+ * 避免嵌入 Web 宿主时污染其布局。
+ *
+ * 修复背景（2026-08-11）：课堂外壳出现竖向滚动条与横向溢出——body 默认 8px margin
+ * 使 100vh 容器 + 16px 超出视口；课堂外壳为「固定视口」布局（内部区域各自滚动）。
+ */
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  /* 防止页面级横向滚动；课堂外壳内部各自处理滚动 */
+  overflow-x: hidden;
+}

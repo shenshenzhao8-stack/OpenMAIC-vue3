@@ -20,6 +20,8 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import type { OpenMaicClassroomProps } from '#/types/public'
+import type { Scene } from '#/types/stage'
+import { resolveAssetUrl } from '#/utils/asset'
 import { useStageStore } from '#/stores/stage'
 import { useInteractiveIframePool } from '#/stores/interactive-iframe-pool'
 import { getClassroom, type ClassroomData } from '#/api/client'
@@ -83,6 +85,28 @@ const error = ref<string | null>(null)
  */
 let loadSeq = 0
 
+/**
+ * 归一化场景资源：把根相对路径（/audio/*.mp3 等）按 assetBaseUrl 解析为可访问地址。
+ * 只处理 speech 音频与 interactive 外部 URL；完整 URL / data URI 由 resolveAssetUrl 原样返回。
+ * 在数据写入 store 前统一处理，audio-player / engine / iframe 消费方零改动。
+ */
+function normalizeAssets(scenes: Scene[]): Scene[] {
+  return scenes.map((scene) => {
+    const actions = (scene.actions ?? []).map((action) => {
+      if (action.type === 'speech' && action.audioUrl) {
+        return { ...action, audioUrl: resolveAssetUrl(action.audioUrl, props.assetBaseUrl) }
+      }
+      return action
+    })
+    let content = scene.content
+    if (content.type === 'interactive' && content.url) {
+      content = { ...content, url: resolveAssetUrl(content.url, props.assetBaseUrl) }
+    }
+    // Scene 为判别联合，展开后需显式断言（调用方保证 type/content 一致）
+    return { ...scene, actions, content } as Scene
+  })
+}
+
 /** 加载课堂：清理旧状态 → 拉取数据 → 写入 stage store */
 async function loadClassroom(id: string) {
   const seq = ++loadSeq
@@ -100,10 +124,12 @@ async function loadClassroom(id: string) {
     const { stage, scenes } = await getClassroom(id)
     // 旧请求晚返回：直接丢弃，不覆盖新课程
     if (seq !== loadSeq) return
+    // 资源路径归一化（assetBaseUrl 适配）
+    const normalizedScenes = normalizeAssets(scenes)
     stageStore.setStage(stage)
-    stageStore.setScenes(scenes)
-    stageStore.setCurrentSceneId(getFirstSceneId(scenes))
-    emit('load-success', { stage, scenes })
+    stageStore.setScenes(normalizedScenes)
+    stageStore.setCurrentSceneId(getFirstSceneId(normalizedScenes))
+    emit('load-success', { stage, scenes: normalizedScenes })
   } catch (e) {
     if (seq !== loadSeq) return
     error.value = e instanceof Error ? e.message : String(e)
@@ -207,7 +233,10 @@ function handleSeek(actionIndex: number) {
 
 <style scoped>
 .classroom {
+  width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
