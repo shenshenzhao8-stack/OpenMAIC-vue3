@@ -199,9 +199,21 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
   2. `ChatArea.vue` 消息气泡 + 输入框；
   3. 引擎接线：`handleUserInterrupt`（打断→live）、`handleEndDiscussion`（恢复）；
   4. 每轮：用户提问 → `agent-loop` 一轮 → 老师回答 → cue_user 等待下一问（多轮靠历史累积）。
+  5. 补充（2026-08-12）：麦克风语音输入（STT）——`useSpeechRecognition`（改写自
+     `prompt-input.tsx` 的 `PromptInputSpeechButton`）+ `speech-recognition.ts`（能力检测 /
+     getUserMedia 权限预检 / 错误分类）；识别结果仅取 final 片段追加到输入框，走普通文本消息通道；
+     `ChatArea.vue` 提供重试按钮与实时音量指示。
+  6. 修复（2026-08-12）：麦克风权限弹窗不出现/误报——`toggle` 先 getUserMedia 预检再
+     `recognition.start()`（对齐原设置页 asr-settings.tsx 的申请路径）；权限类识别错误改为
+     「服务不可用」提示；二次修复增加 insecure-context/unsupported 分类、具体错误名透出与
+     requesting 过程反馈（详见 PHASE-8.md 第九节）。
 - 原项目文件对照：`components/chat/use-chat-sessions.ts`、`chat-area.tsx`、
-  `lib/chat/agent-loop.ts`（已搬）、`engine.ts`（已搬）。
-- 验收：多轮一问一答；播放中提问能打断并恢复；T-03 确认 SSE 是否带音频后决定语音实现。
+  `lib/chat/agent-loop.ts`（已搬）、`engine.ts`（已搬）、
+  `components/ai-elements/prompt-input.tsx`（麦克风输入）、
+  `components/settings/asr-settings.tsx`（getUserMedia 权限预检与麦克风测试）。
+- 验收：多轮一问一答；播放中提问能打断并恢复；麦克风按钮随能力检测显示、权限拒绝友好提示、
+  权限预检可拉起浏览器授权弹窗、识别结果进入输入框、音量指示可用；T-03 确认 SSE 是否带音频后
+  决定语音实现。
 
 ### Phase 9 · 打磨与验收
 
@@ -223,8 +235,10 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 | 4 | interactive iframe 渲染与保活 | Phase 6 |
 | 5 | 字幕逐字 + 语音 + 聚光同步 | Phase 7 |
 | 6 | 登录用户 ↔ 老师多轮一问一答（含打断恢复） | Phase 8 |
-| 7 | 播放引擎调度与原项目一致 | Phase 1/3 |
-| 8 | AI 全走后端接口、mock 保证流程完整、可无痛切换 | Phase 2/9 |
+| 7 | 学生麦克风语音输入（STT）：能力检测 + getUserMedia 权限预检 + 错误分类重试 + 识别入框 | Phase 8 补充 |
+| 8 | 播放引擎调度与原项目一致 | Phase 1/3 |
+| 9 | AI 全走后端接口、mock 保证流程完整、可无痛切换 | Phase 2/9 |
+| 10 | 功能保留回归（规则六）：未明确裁剪的原项目功能逐项点验，含讲义视图（T-18）、进度接线（T-19）等 | 每版本 |
 
 ## 八、文档交付约定（每阶段）
 

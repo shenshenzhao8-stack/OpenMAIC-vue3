@@ -4,14 +4,13 @@
 > 维护规则：依据当前 OpenMAIC 项目根目录 `AGENTS.md`（规则二/三）——
 > ① 范围发生变更时，本表必须同步更新；② 每完成一个阶段，回到本表勾选已落实/已确认的条目。
 
-## 当前状态（2026-08-11，Phase 4.1 完成）
+## 当前状态（2026-08-12，Phase 8 完成 + 麦克风 STT 补充 + 功能保留审查）
 
 | 编号 | 待确认 / 可能变更的点 | 当前假设 | 涉及阶段 / 文件 | 触发条件 / 来源 | 建议处理 |
 |---|---|---|---|---|---|
 | T-01 | **TTS 服务可能不需要**：后台返回的数据结构中同时包含「老师讲解稿（speech.text）」与「音频文件（audioUrl/audioId）」，前端可能无需再调用 TTS 接口 | mock 数据直接提供 /audio/*.mp3（真实语音按动作 id）；TTS mock 已删除（2026-08-12）；AudioPlayer + 浏览器 TTS/朗读计时兜底保留；useDiscussionTTS 队列 Phase 8 | Phase 7 语音同步、`src/core/audio/*`、`src/api/`（mock TTS） | 用户确认：后台数据自带讲解稿与音频 | ① 播放主路径按「直接播数据里的 audioUrl」设计（已落地：mock 直接提供 mp3）；② mock TTS 已删除；③ 待确认后台聊天 SSE 事件是否也携带音频（见 T-03） |
 | T-02 | 后台数据结构字段命名是否与自建类型一致（`persona`、`audioId/audioUrl`、`scene/actions`、`content.canvas` 等） | 自建类型严格对齐原项目 `@openmaic/dsl` 命名 | `src/types/dsl/*`、`src/types/stage.ts`、`mock/classroom.ts` | 后台契约确定后 | 后台接口文档就绪后做「字段映射核对表」，不一致处加适配层（不改自建类型） |
 | T-03 | 后台聊天 SSE 事件是否携带老师回答的音频（如 `agent_end` / `text_delta` 附带 `audioUrl`） | 当前 mock SSE 只推文本，语音走浏览器 TTS 队列（已实现，Phase 8）；若后台 SSE 携带 audioUrl 则简化为直接播放 | Phase 8 互动闭环、`src/core/chat/agent-loop.ts`、`src/core/buffer/stream-buffer.ts` | 后台 SSE 协议确认 | 若事件自带音频：useDiscussionTTS 简化为「收到 audioUrl 直接播放」；若无：保留 TTS 队列 |
-| T-04 | 学生语音输入（STT）是否纳入 | 暂不实现，学生用文本提问 | Phase 8 后扩展 | 用户需求补充 | 预留「麦克风输入」扩展点：STT 结果进入输入框后走普通文本消息通道 |
 | T-05 | interactive 场景的 widget 子类型范围 | iframe 渲染已实现（Phase 6）；widget 配置仍用 `Record<string, unknown>` 占位，待子类型确认后细化 | Phase 6、`src/types/stage.ts` | 需求确认 | 确定子类型后补 `WidgetConfig` 联合类型（对应原 `lib/types/widgets.ts`） |
 | T-06 | 教学动作是否扩展：白板 / discussion / widget 动作的恢复（laser 已恢复） | laser 已于 Phase 4.1 恢复；白板 / discussion / widget 仍裁剪，ActionEngine 其余分支 no-op | `src/core/action/engine.ts`、`src/core/playback/engine.ts` | 需求变更 | 若恢复白板/讨论/widget：ActionEngine 对应分支补实现 + canvas store 补状态字段；引擎本体无需改 |
 | T-08 | 测验简答题判分：由后台 AI 判分接口承接，还是前端 mock | **已裁剪（2026-08-11）**：无判分业务，gradeQuiz 与 mock 已删除 | Phase 5、`src/api/` | 后台确认 | 入参已按原项目对齐，切换时只换 client 实现 |
@@ -22,6 +21,8 @@
 | T-14 | 音频粒度：后台音频是「每句一个文件」还是「整段/整页一个文件」 | 假设每句一个（与 speech action 的 audioId/audioUrl 一一对应） | Phase 7、`src/core/playback/engine.ts` | 后台数据结构确认 | 若整段：需「音频时间轴 ↔ 句子」对齐切分逻辑 |
 | T-15 | 倍速 / 暂停 / 恢复 / 打断重讲与后台音频格式是否兼容 | 引擎已按原项目实现；倍速 UI 已落地（Phase 7）；暂停/恢复精确续播与按场景播放已修复（2026-08-12） | Phase 3/7/8 | 真实验收 | 联调时逐项验证；若后台音频不支持倍速，需 `playbackRate` 降级方案 |
 | T-16 | 多角色讨论移除（2026-08-07 范围调整）：互动仅「登录用户 ↔ 老师」一问一答、可多轮 | 互动已实现（Phase 8）：每轮一次一问一答，历史逐轮累积；无圆桌/多角色 | Phase 1 已调整、Phase 8 落实 | 用户确认 | 若将来要恢复多角色：恢复导演多 agent 编排、圆桌组件与 discussion 动作 |
+| T-18 | **功能丢失（2026-08-12 审查发现）：讲义视图（Lecture Notes）缺失**——原项目聊天区为「讲义（lecture）+ 对话（chat）」双 tab 且默认讲义页，由 `lib/chat/lecture-notes.ts` 的 `buildLectureNotes(scenes)` 纯函数生成讲义条目（speech/spotlight/laser 等动作），`components/chat/lecture-notes-view.tsx` 渲染 | 新工程 ChatArea 仅问答面板，无讲义 tab；文档此前无裁剪记录，属**无意识丢失** | 待补：`src/utils/lecture-notes.ts`（照搬纯函数）+ `ChatArea.vue` 讲义 tab + 讲义渲染 | 验收发现（2026-08-12 功能保留审查） | 按规则六补回：先照搬 `buildLectureNotes`（纯函数，适配本项目 action 类型），再在 ChatArea 增加 lecture/chat 双 tab；完成前在「已落实」登记关闭 |
+| T-19 | **功能丢失（2026-08-12 审查发现）：播放进度未接线**——引擎 `PlaybackEngineCallbacks.onProgress` 已支持（types.ts:88）但 `usePlaybackEngine` 未接；`jumpToAction` / `canJumpToAction` 引擎已实现但未暴露给任何 UI，无进度跳转 | 新工程顶栏只有播放/暂停/停止/翻页/倍速，无进度指示与进度跳转；其中「位置持久化（刷新恢复）」已由 T-10 记录 | 待补：`usePlaybackEngine` 接 `onProgress` 暴露 `currentActionIndex/total`；顶栏或字幕条加进度条（可点跳转调 `jumpToAction`） | 验收发现（2026-08-12 功能保留审查） | 按规则六补接：onProgress 更新响应式进度状态；UI 进度条点击 → `jumpToAction`；位置持久化另行按 T-10 决策 |
 
 ## 已落实 / 已关闭条目
 
@@ -32,3 +33,5 @@
 | T-17 | 已落实（2026-08-11） | 按需求决策：slide 元素仅补充 **line**；chart / table / video / code 与 **latex**（含类型定义、实现、katex 依赖）全部删除；删除记录见 docs/PHASE-4.1.md |
 
 | T-08 | 已落实（2026-08-11） | 按需求裁剪判分业务：无得分 / 无 AI 判分；client.gradeQuiz、quiz-grade mock、grading.ts 已删除；复盘仅选择题对错 + 简答题参考答案（见 docs/PHASE-5.md） |
+| T-04 | 已落实（2026-08-12） | 麦克风语音输入（STT）已实现：`useSpeechRecognition`（Web Speech API + getUserMedia 权限预检，对齐原项目 PromptInputSpeechButton 与设置页 asr-settings.tsx）+ 能力检测 / 错误分类（含非安全上下文与环境不支持）/ 具体错误名透出 / 重试（含 requesting 反馈）/ 音量指示；final 片段追加输入框走普通文本通道（见 docs/PHASE-8.md「八、功能补充记录」「九、问题修复记录」） |
+| T-18/T-19 | 已定位待补（2026-08-12） | 功能保留审查确认两处无意识丢失（讲义视图、onProgress/进度跳转），已登记上表待补；根因与处置见 docs/PHASE-8.md「十、功能保留审查记录」与 AGENTS.md 规则六 |
