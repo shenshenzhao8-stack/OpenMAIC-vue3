@@ -49,9 +49,15 @@ export function useDiscussionTTS() {
 
   // 卸载清理：停止朗读、清空队列
   onBeforeUnmount(() => {
+    reset()
+  })
+
+  /** 复位语音队列并停止当前朗读（课程切换时调用，MONOREPO Phase 1） */
+  function reset() {
     queue.reset()
     window.speechSynthesis?.cancel()
-  })
+    speakingAgentId.value = null
+  }
 
   /** 封口回调：完整句子入队（语音只在文字写完才合成） */
   function handleSegmentSealed(
@@ -68,5 +74,6 @@ export function useDiscussionTTS() {
     handleSegmentSealed,
     shouldHold: queue.shouldHold,
     speakingAgentId,
+    reset,
   }
 }

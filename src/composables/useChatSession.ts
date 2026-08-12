@@ -168,10 +168,22 @@ export function useChatSession() {
     }
   }
 
+  /** 清空问答会话（课程切换时调用，MONOREPO Phase 1）：
+   *  - 清空对话历史（避免上一课程的问答残留到下一课程）；
+   *  - 复位流式状态与消息计数器；
+   *  - 复位语音队列（未播完的上一课程回答不再继续朗读）。 */
+  function reset() {
+    messages.value = []
+    isStreaming.value = false
+    userCounter = 0
+    tts.reset()
+  }
+
   return {
     messages,
     isStreaming,
     sendMessage,
+    reset,
     speakingAgentId: computed(() => tts.speakingAgentId.value),
   }
 }
