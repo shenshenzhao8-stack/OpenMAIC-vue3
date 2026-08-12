@@ -28,4 +28,5 @@ OpenMAIC 项目根目录的 `AGENTS.md`，本仓库不再单独复制规则文�
 - [x] Phase 5：Quiz 场景（无判分）
 - [x] Phase 6：Interactive 场景（iframe 安全渲染 + 保活池）
 - [x] Phase 7：语音文字同步（字幕逐字 + 倍速）
-- [ ] 后续阶段（互动闭环）
+- [x] Phase 8：互动闭环（登录用户 ↔ 老师多轮一问一答）
+- [ ] 后续阶段（打磨验收）

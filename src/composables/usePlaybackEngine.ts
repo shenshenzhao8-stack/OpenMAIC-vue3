@@ -1,23 +1,17 @@
 /**
  * 文件头：播放引擎接线（composable）
  *
- * 对应原项目：components/edit/PlaybackChromeRoot.tsx（创建 PlaybackEngine/ActionEngine/
- * AudioPlayer 并接回调）与 components/stage.tsx（播放/编辑模式分发，本项目仅播放）。
+ * 对应原项目：components/edit/PlaybackChromeRoot.tsx（创建引擎并接回调）
  *
- * 功能（Phase 7 更新 + 2026-08-12 修复）：
- *   - ★ 按当前场景播放：引擎每次只接收「当前场景」单例数组（与原项目 [currentScene]
- *     一致）——每个场景独立播放，播完即停，不自动连播整堂课（问题 2 修复）；
- *   - 切场景：watch currentSceneId → 重建当前场景引擎（新场景从头播放）；
- *   - 字幕逐字：onSpeechStart → StreamBuffer 打字机 pushText + sealText → onTextReveal 逐字更新；
- *   - 语音：AudioPlayer 播放（mock 已填充模拟音频，暂停/恢复精确续播）；无音频时
- *     由引擎走朗读计时 / 浏览器 TTS 兜底（该兜底整句重讲，与原文案一致）；
- *   - 倍速：settings.playbackSpeed 变化实时同步到 AudioPlayer.playbackRate。
- *
- * 说明：
- *   - useDiscussionTTS 推迟到 Phase 8（唯一调用方是问答 UI）；
- *   - 手动翻页（nextScene/prevScene）切 currentSceneId → watcher 重建引擎。
+ * 功能（Phase 7/8）：
+ *   - ★ 按当前场景播放（[currentScene]，问题 2 修复）；切场景重建引擎；
+ *   - 字幕逐字：StreamBuffer 打字机；
+ *   - 语音：AudioPlayer 播后台音频（mock 提供 mp3），无音频时朗读计时/浏览器 TTS 兜底；
+ *   - 倍速：下拉框 → settings → AudioPlayer 实时同步；
+ *   - 互动（Phase 8）：interrupt(text) 打断讲课进入 live；endDiscussion() 恢复讲课；
+ *     play() 在讨论结束恢复位置时走 continuePlayback（而非从头）。
  */
-import { ref, readonly, watch, onBeforeUnmount } from 'vue'
+import { ref, readonly, computed, watch, onBeforeUnmount } from 'vue'
 import { useStageStore } from '@/stores/stage'
 import { useSettingsStore } from '@/stores/settings'
 import { PlaybackEngine } from '@/core/playback/engine'
@@ -31,21 +25,18 @@ export function usePlaybackEngine() {
   const stageStore = useStageStore()
   const settingsStore = useSettingsStore()
 
-  // 引擎状态（响应式，供 UI 显示与按钮切换）
   const mode = ref<EngineMode>('idle')
-  // 当前讲解台词（字幕；由打字机逐字更新，保留到下一句替换）
   const lectureSpeech = ref<string | null>(null)
 
   let audioPlayer: AudioPlayer | null = null
   let engine: PlaybackEngine | null = null
-  /** 字幕打字机（逐字揭示） */
   let subtitleBuffer: StreamBuffer | null = null
-  /** 字幕消息计数（生成唯一 messageId） */
   let speechCounter = 0
-  /** 当前引擎所属场景 id（用于判断是否需要重建） */
   let engineSceneId: string | null = null
 
-  /** 销毁旧引擎及附属资源（切场景/卸载时调用） */
+  /** 直播/讨论中（用于 UI 显示「继续讲课」） */
+  const isLive = computed(() => mode.value === 'live')
+
   function teardownEngine() {
     engine?.stop()
     engine = null
@@ -59,7 +50,6 @@ export function usePlaybackEngine() {
     mode.value = 'idle'
   }
 
-  /** 为「当前场景」创建新引擎（每次只传单场景数组，播完即停） */
   function buildEngine(): PlaybackEngine | null {
     const scene = stageStore.currentScene
     if (!scene) return null
@@ -68,7 +58,6 @@ export function usePlaybackEngine() {
     audioPlayer = createAudioPlayer()
     audioPlayer.setPlaybackRate(settingsStore.playbackSpeed)
 
-    // 字幕打字机
     subtitleBuffer = new StreamBuffer(
       {
         onTextReveal: (_messageId, _partId, revealedText) => {
@@ -89,32 +78,34 @@ export function usePlaybackEngine() {
     subtitleBuffer.start()
 
     const actionEngine = new ActionEngine(audioPlayer)
-    // ★ 单场景数组：当前场景的剧本独立播放（对应原项目 [currentScene]）
-    engine = new PlaybackEngine(getSceneForPlayback(stageStore.scenes, stageStore.currentSceneId), actionEngine, audioPlayer, {
-      onModeChange: (next) => {
-        mode.value = next
+    engine = new PlaybackEngine(
+      getSceneForPlayback(stageStore.scenes, stageStore.currentSceneId),
+      actionEngine,
+      audioPlayer,
+      {
+        onModeChange: (next) => {
+          mode.value = next
+        },
+        onSpeechStart: (text) => {
+          speechCounter += 1
+          const id = `lecture-${speechCounter}`
+          subtitleBuffer?.pushText(id, text, 'default-1')
+          subtitleBuffer?.sealText(id)
+        },
+        onSpeechEnd: () => {},
+        getPlaybackSpeed: () => settingsStore.playbackSpeed,
+        isAgentSelected: () => true,
       },
-      onSpeechStart: (text) => {
-        speechCounter += 1
-        const id = `lecture-${speechCounter}`
-        subtitleBuffer?.pushText(id, text, 'default-1')
-        subtitleBuffer?.sealText(id)
-      },
-      onSpeechEnd: () => {},
-      getPlaybackSpeed: () => settingsStore.playbackSpeed,
-      isAgentSelected: () => true,
-    })
+    )
     return engine
   }
 
-  /** 确保引擎存在且对应当前场景；否则重建 */
   function ensureEngine(): PlaybackEngine | null {
     if (engine && engineSceneId === stageStore.currentSceneId) return engine
     teardownEngine()
     return buildEngine()
   }
 
-  /** 切场景：销毁旧引擎（新场景从头播放，不自动连播） */
   watch(
     () => stageStore.currentSceneId,
     () => {
@@ -122,7 +113,6 @@ export function usePlaybackEngine() {
     },
   )
 
-  /** 倍速实时同步到 AudioPlayer（播放中立即生效） */
   watch(
     () => settingsStore.playbackSpeed,
     (rate) => {
@@ -130,40 +120,47 @@ export function usePlaybackEngine() {
     },
   )
 
-  /** 开始播放当前场景（idle → playing） */
+  /** 播放当前场景；若刚从讨论恢复（保存了讲课位置）则 continuePlayback 而非从头 */
   function play() {
-    ensureEngine()?.start()
+    const e = ensureEngine()
+    if (!e) return
+    if (e.hasLectureInterruption()) e.continuePlayback()
+    else e.start()
   }
 
-  /** 暂停（有音频：精确暂停，可续播） */
   function pause() {
     engine?.pause()
   }
 
-  /** 恢复（有音频：从暂停处精确续播） */
   function resume() {
     engine?.resume()
   }
 
-  /** 停止并回到初始 */
   function stop() {
     engine?.stop()
     lectureSpeech.value = null
   }
 
-  /** 手动翻页：下一页（切 currentSceneId → watcher 重建引擎） */
+  /** 学生提问：打断讲课 → 进入 live（保存位置，讨论结束后恢复） */
+  function interrupt(text: string) {
+    engine?.handleUserInterrupt(text)
+  }
+
+  /** 讨论结束：恢复讲课位置 → idle（用户点「播放」后 continuePlayback） */
+  function endDiscussion() {
+    engine?.handleEndDiscussion()
+  }
+
   function nextScene() {
     const id = getAdjacentSceneId(stageStore.scenes, stageStore.currentSceneId, 1)
     if (id) stageStore.setCurrentSceneId(id)
   }
 
-  /** 手动翻页：上一页 */
   function prevScene() {
     const id = getAdjacentSceneId(stageStore.scenes, stageStore.currentSceneId, -1)
     if (id) stageStore.setCurrentSceneId(id)
   }
 
-  // 卸载清理
   onBeforeUnmount(() => {
     teardownEngine()
   })
@@ -171,10 +168,13 @@ export function usePlaybackEngine() {
   return {
     mode: readonly(mode),
     lectureSpeech: readonly(lectureSpeech),
+    isLive,
     play,
     pause,
     resume,
     stop,
+    interrupt,
+    endDiscussion,
     nextScene,
     prevScene,
   }

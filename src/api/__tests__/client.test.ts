@@ -111,3 +111,17 @@ describe('mock 课堂 speech 音频（2026-08-12：数据自带 mp3）', () => {
     }
   })
 })
+
+describe('mock chat 多轮唯一 messageId（2026-08-12 问题修复）', () => {
+  it('两次请求返回不同的 agent_start messageId（避免多轮命中旧消息）', async () => {
+    const r1 = await chatStream({ messages: [], storeState: {} }, new AbortController().signal)
+    const r2 = await chatStream({ messages: [], storeState: {} }, new AbortController().signal)
+    const e1 = (await readSseEvents(r1)) as Array<{ type: string; data: { messageId: string } }>
+    const e2 = (await readSseEvents(r2)) as Array<{ type: string; data: { messageId: string } }>
+    const id1 = e1.find((e) => e.type === 'agent_start')?.data.messageId
+    const id2 = e2.find((e) => e.type === 'agent_start')?.data.messageId
+    expect(id1).toBeTruthy()
+    expect(id2).toBeTruthy()
+    expect(id1).not.toBe(id2)
+  })
+})

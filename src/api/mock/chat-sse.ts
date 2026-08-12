@@ -4,12 +4,11 @@
  * 对应原项目：app/api/chat/route.ts（后端 /api/chat 的 SSE 输出行为）
  *
  * 功能：模拟后端「一问一答」：收到完整请求体后，按 StatelessEvent 协议
- * （agent_start → text_delta×N → agent_end → done）输出一条 SSE 流，
- * 回答为固定示例文本（老师讲解光反应）。
+ * （agent_start → text_delta×N → agent_end → done）输出一条 SSE 流。
+ * 多轮演示：按「用户已提问次数」轮换两套答案（体现多轮历史累积）。
  *
- * 为什么用 ReadableStream 实现：agent-loop 通过 response.body.getReader() 解析 SSE，
- * 与真实后端交互方式完全一致；将来切换真实后端时只替换 client.chatStream() 的实现，
- * 解析代码零改动（见 TODO T-03/T-13）。
+ * ★ 每轮唯一 messageId：对齐原项目 director-graph.ts 的 `assistant-${agentId}-${Date.now()}`；
+ * 固定 id 会导致前端多轮时按 id 定位消息命中旧气泡（2026-08-12 问题修复记录）。
  */
 import type { StatelessEvent } from '@/types/chat'
 
@@ -23,28 +22,38 @@ function chunkText(text: string, size: number): string[] {
 }
 
 /**
- * 生成一条 mock SSE 响应（一问一答，固定回答内容）。
- * @param body 请求体（messages/storeState/config），mock 阶段不解析，仅保证签名与真实一致
- * @param signal 中止信号（mock 阶段不中断，保留参数以对齐真实接口）
+ * 生成一条 mock SSE 响应（一问一答）。
+ * @param _body 请求体（messages/storeState/config）；mock 只读取 messages 统计提问轮数
+ * @param _signal 中止信号（mock 阶段不中断，保留参数以对齐真实接口）
  */
 export function createMockChatResponse(
   _body: Record<string, unknown>,
   _signal: AbortSignal,
 ): Response {
-  // 示例回答（老师口吻，中文）
-  const answer =
-    '光反应发生在叶绿体的类囊体薄膜上，水在光下分解产生氧气、H+ 和电子，同时生成 ATP 与 NADPH。'
+  // 多轮演示：按「用户已提问次数」轮换两套答案
+  const rawMessages = Array.isArray(_body.messages)
+    ? (_body.messages as Array<{ role?: string }>)
+    : []
+  const userCount = rawMessages.filter((m) => m.role === 'user').length
+  const answers = [
+    '光反应发生在叶绿体的类囊体薄膜上，水在光下分解产生氧气、H+ 和电子。',
+    '暗反应在基质中进行，利用 ATP 与 NADPH 把二氧化碳合成为有机物。',
+  ]
+  const answer = answers[userCount % answers.length]
+
+  // ★ 每轮唯一 messageId（时间戳 + 随机后缀）
+  const messageId = `m-${Date.now()}-${Math.random().toString(36).slice(2)}`
 
   const events: StatelessEvent[] = [
     {
       type: 'agent_start',
-      data: { messageId: 'm-mock-1', agentId: 'default-1', agentName: 'AI 老师' },
+      data: { messageId, agentId: 'default-1', agentName: 'AI 老师' },
     },
     ...chunkText(answer, 8).map((content) => ({
       type: 'text_delta' as const,
-      data: { content, messageId: 'm-mock-1' },
+      data: { content, messageId },
     })),
-    { type: 'agent_end', data: { messageId: 'm-mock-1', agentId: 'default-1' } },
+    { type: 'agent_end', data: { messageId, agentId: 'default-1' } },
     {
       type: 'done',
       data: {

@@ -1,11 +1,12 @@
 <!--
   文件头：课堂播放页（课堂外壳）
   对应原项目：app/classroom/[id]/page.tsx（加载课堂）+ components/stage.tsx（舞台根）+ PlaybackChromeRoot（引擎接线）
-  功能（Phase 3-6）：
+  功能（Phase 3-8）：
     1. 加载 mock 课堂数据并写入 stage store；
-    2. 课堂外壳：顶栏（课程信息 + 播放控制）、侧边栏（场景列表）、主区（场景渲染分发）；
-    3. 播放引擎接线：usePlaybackEngine；
-    4. 全局挂载 InteractiveIframeHost：交互场景的 iframe 不随场景切换卸载（保活）。
+    2. 课堂外壳：顶栏（课程信息 + 播放控制）、侧边栏（场景列表）、主区（场景渲染）、问答面板；
+    3. 播放引擎接线 + 打断/恢复（Phase 8）：学生提问 → interrupt（保存位置进 live）→ 老师回答
+       → 点「继续讲课」→ endDiscussion（恢复位置）；
+    4. 全局挂载 InteractiveIframeHost（交互 iframe 保活）。
 -->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
@@ -14,18 +15,39 @@ import { useStageStore } from '@/stores/stage'
 import { getClassroom } from '@/api/client'
 import { getFirstSceneId } from '@/utils/playback-navigation'
 import { usePlaybackEngine } from '@/composables/usePlaybackEngine'
+import { useChatSession } from '@/composables/useChatSession'
 import HeaderControls from '@/components/stage/HeaderControls.vue'
 import SceneSidebar from '@/components/stage/SceneSidebar.vue'
 import SceneProvider from '@/components/stage/SceneProvider.vue'
 import SceneRenderer from '@/components/stage/SceneRenderer.vue'
 import InteractiveIframeHost from '@/components/scenes/interactive/InteractiveIframeHost.vue'
+import ChatArea from '@/components/chat/ChatArea.vue'
 
 const route = useRoute()
 const stageStore = useStageStore()
 
 // 播放引擎接线（引擎实例唯一，控制按钮与字幕共用）
-const { mode, lectureSpeech, play, pause, resume, stop, nextScene, prevScene } =
-  usePlaybackEngine()
+const {
+  mode,
+  lectureSpeech,
+  isLive,
+  play,
+  pause,
+  resume,
+  stop,
+  interrupt,
+  endDiscussion,
+  nextScene,
+  prevScene,
+} = usePlaybackEngine()
+
+// 问答会话（登录用户 ↔ 老师多轮一问一答）；解构为顶层 ref 便于模板自动解包
+const {
+  messages: chatMessages,
+  isStreaming: chatStreaming,
+  speakingAgentId: chatSpeakingAgentId,
+  sendMessage: chatSend,
+} = useChatSession()
 
 // 加载状态
 const loading = ref(true)
@@ -37,7 +59,6 @@ onMounted(async () => {
     const { stage, scenes } = await getClassroom(classroomId)
     stageStore.setStage(stage)
     stageStore.setScenes(scenes)
-    // 默认进入第一页
     stageStore.setCurrentSceneId(getFirstSceneId(scenes))
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
@@ -45,17 +66,25 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+/** 发送提问：播放中先打断讲课（保存位置进 live），再发一轮一问一答 */
+function handleSend(text: string) {
+  if (mode.value === 'playing') interrupt(text)
+  void chatSend(text)
+}
+
+/** 继续讲课：恢复被打断的位置 */
+function handleContinue() {
+  endDiscussion()
+}
 </script>
 
 <template>
   <main class="classroom">
-    <!-- 加载中 -->
     <p v-if="loading" class="status">课堂加载中…</p>
-    <!-- 错误态 -->
     <p v-else-if="error" class="status error">{{ error }}</p>
 
     <template v-else>
-      <!-- 顶栏：课程信息 + 播放控制 -->
       <header class="topbar">
         <div class="course">
           <h1>{{ stageStore.stage?.name }}</h1>
@@ -72,7 +101,6 @@ onMounted(async () => {
         />
       </header>
 
-      <!-- 舞台区：侧边栏 + 场景渲染 -->
       <div class="stage-body">
         <SceneSidebar />
         <section class="stage-main">
@@ -80,15 +108,22 @@ onMounted(async () => {
             <SceneRenderer />
           </SceneProvider>
         </section>
+        <!-- 问答面板（登录用户 ↔ 老师） -->
+        <ChatArea
+          :messages="chatMessages"
+          :is-streaming="chatStreaming"
+          :is-live="isLive"
+          :speaking-agent-id="chatSpeakingAgentId"
+          :on-send="handleSend"
+          :on-continue="handleContinue"
+        />
       </div>
 
-      <!-- 字幕条（引擎 onSpeechStart 驱动；Phase 7 做逐字/语音同步） -->
       <footer v-if="lectureSpeech" class="subtitle-bar">
         {{ lectureSpeech }}
       </footer>
     </template>
 
-    <!-- 全局交互 iframe 宿主：保活，不随场景切换卸载 -->
     <InteractiveIframeHost />
   </main>
 </template>
