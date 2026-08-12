@@ -76,7 +76,7 @@ function evictLru(
   return next
 }
 
-export const useInteractiveIframePool = defineStore('interactive-iframe-pool', {
+export const useInteractiveIframePool = defineStore('openmaic-interactive-iframe-pool', {
   state: (): InteractiveIframePoolState => ({
     entries: {},
     activeSceneId: null,

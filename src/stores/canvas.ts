@@ -61,7 +61,7 @@ interface CanvasState {
 }
 
 /** Pinia store 定义（不直接导出，导出带兼容层的包装） */
-const canvasStoreDefinition = defineStore('canvas', {
+const canvasStoreDefinition = defineStore('openmaic-canvas', {
   state: (): CanvasState => ({
     spotlightElementId: '',
     spotlightOptions: null,

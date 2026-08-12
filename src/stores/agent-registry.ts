@@ -35,7 +35,7 @@ interface AgentRegistryState {
   agents: Record<string, AgentConfig>
 }
 
-export const useAgentRegistry = defineStore('agent-registry', {
+export const useAgentRegistry = defineStore('openmaic-agent-registry', {
   state: (): AgentRegistryState => ({
     agents: { 'default-1': DEFAULT_TEACHER },
   }),

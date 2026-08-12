@@ -18,10 +18,11 @@
   composables；`@/` → `#/` 内部引用迁移已在 Phase 2 完成。
 -->
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, provide } from 'vue'
 import type { OpenMaicClassroomProps } from '#/types/public'
 import type { Scene } from '#/types/stage'
 import { resolveAssetUrl } from '#/utils/asset'
+import { clearLocalAudioCache } from '#/core/audio/audio-player'
 import { useStageStore } from '#/stores/stage'
 import { useInteractiveIframePool } from '#/stores/interactive-iframe-pool'
 import { getClassroom, type ClassroomData } from '#/api/client'
@@ -46,6 +47,9 @@ const emit = defineEmits<{
 
 const stageStore = useStageStore()
 const iframePool = useInteractiveIframePool()
+
+// 向下层组件提供 classroomId（Quiz 草稿 key 命名空间等使用，MONOREPO Phase 4）
+provide('openmaicClassroomId', props.classroomId)
 
 // 播放引擎接线（引擎实例唯一，控制按钮与字幕共用）
 const {
@@ -118,6 +122,7 @@ async function loadClassroom(id: string) {
   stop()
   resetChat()
   iframePool.reset()
+  clearLocalAudioCache()
   stageStore.clearStore()
 
   try {
@@ -150,6 +155,12 @@ watch(
 // 首次挂载加载
 onMounted(() => {
   void loadClassroom(props.classroomId)
+})
+
+// 组件卸载：使未完成加载请求失效（不再写状态）、清空模块级音频缓存
+onBeforeUnmount(() => {
+  loadSeq += 1
+  clearLocalAudioCache()
 })
 
 /** 发送提问：播放中先打断讲课（保存位置进 live），再发一轮一问一答 */

@@ -41,7 +41,7 @@ interface SettingsState {
 }
 
 /** Pinia store 定义（不直接导出，导出带兼容层的包装） */
-const settingsStoreDefinition = defineStore('settings', {
+const settingsStoreDefinition = defineStore('openmaic-settings', {
   state: (): SettingsState => ({
     ttsEnabled: true,
     ttsProviderId: 'browser-native-tts',

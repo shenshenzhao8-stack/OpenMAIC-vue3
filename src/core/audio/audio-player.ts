@@ -36,6 +36,14 @@ export interface AudioPlayer {
 /** 本地音频缓存：audioId → Blob（简化版，替代原项目的 IndexedDB） */
 const localAudioCache = new Map<string, Blob>()
 
+/**
+ * 清空本地音频缓存（MONOREPO Phase 4：组件卸载/课程切换时调用）。
+ * 单实例约束下直接整表清空；若未来支持多实例，改为按课堂 id 分桶。
+ */
+export function clearLocalAudioCache(): void {
+  localAudioCache.clear()
+}
+
 /** AudioPlayer 实现（见文件头功能说明） */
 export class BrowserAudioPlayer implements AudioPlayer {
   private audio: HTMLAudioElement | null = null
@@ -45,6 +53,8 @@ export class BrowserAudioPlayer implements AudioPlayer {
   private playbackRate = 1
   /** 播放令牌：每次 play/pause/stop 自增，旧播放的异步回调据此失效 */
   private requestToken = 0
+  /** 当前活动 Blob URL（cacheAudio 分支创建，停止时需回收） */
+  private activeBlobUrl: string | null = null
 
   /** 停止并释放当前音频元素 */
   private stopAudioElement(): void {
@@ -52,6 +62,11 @@ export class BrowserAudioPlayer implements AudioPlayer {
       this.audio.pause()
       this.audio.currentTime = 0
       this.audio = null
+    }
+    // 回收活动 Blob URL，防止 stop/销毁后泄漏
+    if (this.activeBlobUrl) {
+      URL.revokeObjectURL(this.activeBlobUrl)
+      this.activeBlobUrl = null
     }
   }
 
@@ -89,17 +104,20 @@ export class BrowserAudioPlayer implements AudioPlayer {
       this.stopAudioElement()
       if (requestToken !== this.requestToken) return false
       const blobUrl = URL.createObjectURL(blob)
+      this.activeBlobUrl = blobUrl
       this.audio = new Audio()
       this.audio.src = blobUrl
       this.audio.volume = this.muted ? 0 : this.volume
       this.audio.playbackRate = this.playbackRate
       this.audio.addEventListener('ended', () => {
+        this.activeBlobUrl = null
         URL.revokeObjectURL(blobUrl)
         this.onEndedCallback?.()
       })
       try {
         await this.audio.play()
       } catch (playError) {
+        this.activeBlobUrl = null
         URL.revokeObjectURL(blobUrl)
         throw playError
       }

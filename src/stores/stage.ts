@@ -25,7 +25,7 @@ interface StageState {
   mode: StageMode
 }
 
-export const useStageStore = defineStore('stage', {
+export const useStageStore = defineStore('openmaic-stage', {
   state: (): StageState => ({
     stage: null,
     scenes: [],

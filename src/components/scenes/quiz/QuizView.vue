@@ -6,7 +6,7 @@
   复盘规则：选择题仅显示对错（✓/✗）；简答题显示参考答案。
 -->
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, inject } from 'vue'
 import type { Scene, QuizQuestion } from '#/types/stage'
 import SingleChoiceQuestion from './SingleChoiceQuestion.vue'
 import MultipleChoiceQuestion from './MultipleChoiceQuestion.vue'
@@ -14,6 +14,8 @@ import ShortAnswerQuestion from './ShortAnswerQuestion.vue'
 import { isChoiceCorrect, isQuestionAnswered } from '#/utils/quiz-check'
 
 const props = defineProps<{ scene: Scene | null }>()
+/** 课堂 id（由 OpenMaicClassroom provide 注入，用于草稿 key 命名空间） */
+const classroomId = inject<string>('openmaicClassroomId', '')
 
 const questions = computed<QuizQuestion[]>(() =>
   props.scene?.type === 'quiz' ? props.scene.content.questions : [],
@@ -23,9 +25,12 @@ const questions = computed<QuizQuestion[]>(() =>
 const phase = ref<'not_started' | 'answering' | 'reviewing'>('not_started')
 const answers = ref<Record<string, string | string[]>>({})
 
-// 本地草稿（localStorage，按场景 id 存；Phase 5 简化方案）
-const DRAFT_KEY = 'openmaic-quiz-draft:'
-const draftKey = computed(() => (props.scene?.id ? `${DRAFT_KEY}${props.scene.id}` : ''))
+// 本地草稿（localStorage，按「课堂 + 场景」命名空间存；MONOREPO Phase 4）
+const draftKey = computed(() =>
+  props.scene?.id && classroomId
+    ? `openmaic:${classroomId}:quiz:${props.scene.id}`
+    : '',
+)
 watch(draftKey, () => {
   if (!draftKey.value) return
   try {

@@ -9,9 +9,11 @@
  *   - ★ 每轮新建打字机（对齐原项目 per-iteration buffer）：避免 StreamBuffer 的
  *     _drained 粘滞（waitUntilDrained 第二轮立即返回）与队列残留；
  *   - 语音：封口时完整句子交给 useDiscussionTTS 朗读，shouldHold 等语音；
- *   - 打断/恢复讲课由 ClassroomPage 协调（engine.interrupt / endDiscussion）。
+ *   - 打断/恢复讲课由 ClassroomPage 协调（engine.interrupt / endDiscussion）；
+ *   - MONOREPO Phase 4：sendMessage 持有当前 AbortController，reset()/卸载时
+ *     abort 活动 SSE 请求，防止课程切换/离开课堂后请求继续推进 UI 状态。
  */
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import { useStageStore } from '#/stores/stage'
 import { useCanvasStore } from '#/stores/canvas'
 import { runAgentLoop, type AgentLoopStoreState } from '#/core/chat/agent-loop'
@@ -40,11 +42,16 @@ export function useChatSession() {
 
   /** 用户消息计数（避免同毫秒 id 冲突） */
   let userCounter = 0
+  /** 当前活动 SSE 请求的 AbortController（reset/卸载时 abort） */
+  let activeController: AbortController | null = null
 
   /** 发送一条用户消息（多轮：历史累积，每轮一次一问一答） */
   async function sendMessage(content: string) {
     const text = content.trim()
     if (!text || isStreaming.value) return
+
+    // 中止上一个未完成请求（理论上 isStreaming 已阻止并发，双保险）
+    activeController?.abort()
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}-${userCounter++}`,
@@ -87,6 +94,8 @@ export function useChatSession() {
     } | null = null
 
     try {
+      const controller = new AbortController()
+      activeController = controller
       await runAgentLoop(
         { config: { agentIds: ['default-1'] }, apiKey: '' },
         {
@@ -160,9 +169,10 @@ export function useChatSession() {
               : null
           },
         },
-        new AbortController().signal,
+        controller.signal,
       )
     } finally {
+      activeController = null
       buf.dispose()
       isStreaming.value = false
     }
@@ -173,11 +183,19 @@ export function useChatSession() {
    *  - 复位流式状态与消息计数器；
    *  - 复位语音队列（未播完的上一课程回答不再继续朗读）。 */
   function reset() {
+    activeController?.abort()
+    activeController = null
     messages.value = []
     isStreaming.value = false
     userCounter = 0
     tts.reset()
   }
+
+  // 组件卸载：中止活动 SSE 请求，防止离开课堂后请求继续回调
+  onBeforeUnmount(() => {
+    activeController?.abort()
+    activeController = null
+  })
 
   return {
     messages,
