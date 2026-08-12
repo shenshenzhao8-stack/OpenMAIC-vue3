@@ -8,7 +8,6 @@
  *   - 教学动作：speech / spotlight / laser；
  *   - slide 元素：仅 text / shape / line / image（已移除 latex 元素示例）。
  *
- * 注意：speech 动作暂不填 audioUrl/audioId（后台真实数据会带音频，见 TODO T-01）。
  */
 import type { Scene, Stage } from '@/types/stage'
 import type { Action } from '@/types/action'
@@ -30,26 +29,26 @@ export const mockClassroomStage: Stage = {
 
 /** 第一页：封面幻灯片（文字 + 图片 + 线条箭头），演示 speech / spotlight / laser 动作 */
 const slide1Actions: Action[] = [
-  { id: 'a1', type: 'speech', text: '同学们好，今天我们来学习光合作用。' },
+  { id: 'a1', type: 'speech', text: '同学们好，今天我们来学习光合作用。', audioUrl: '/audio/a1.mp3' },
   { id: 'a2', type: 'spotlight', elementId: 'img_leaf', dimOpacity: 0.5 },
   { id: 'a3', type: 'laser', elementId: 'txt_title', color: '#ff0000' },
-  { id: 'a4', type: 'speech', text: '请看标题与这张图，这是光合作用。' },
+  { id: 'a4', type: 'speech', text: '请看标题与这张图，这是光合作用。', audioUrl: '/audio/a4.mp3' },
 ]
 
 /** 第二页：随堂测验（单选 + 多选 + 简答） */
 const quizActions: Action[] = [
-  { id: 'b1', type: 'speech', text: '现在让我们做一个随堂测验，检验一下学习成果。' },
+  { id: 'b1', type: 'speech', text: '现在让我们做一个随堂测验，检验一下学习成果。', audioUrl: '/audio/b1.mp3' },
 ]
 
 /** 第三页：交互模拟实验（iframe HTML） */
 const interactiveActions: Action[] = [
-  { id: 'c1', type: 'speech', text: '请拖动滑块，观察光照强度对光合速率的影响。' },
+  { id: 'c1', type: 'speech', text: '请拖动滑块，观察光照强度对光合速率的影响。', audioUrl: '/audio/c1.mp3' },
 ]
 
 /** 第四页：光反应与暗反应总结 */
 const slide2Actions: Action[] = [
-  { id: 'd1', type: 'speech', text: '总结一下：光反应在类囊体薄膜，暗反应在基质。' },
   { id: 'd2', type: 'laser', elementId: 'txt_summary', color: '#ff0000' },
+  { id: 'd1', type: 'speech', text: '总结一下：光反应在类囊体薄膜，暗反应在基质。', audioUrl: '/audio/d1.mp3' },
 ]
 
 /** 内联 SVG 图片（data URI，无需网络即可显示） */

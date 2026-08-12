@@ -116,7 +116,7 @@
 ```
 src/
 ├─ App.vue / main.ts / env.d.ts / styles.css
-├─ api/            client.ts + mock/{chat-sse,tts}.ts + 测试
+├─ api/            client.ts + mock/chat-sse.ts + 测试
 ├─ components/
 │  ├─ scenes/interactive/  InteractiveRenderer.vue + InteractiveIframeHost.vue
 │  ├─ scenes/quiz/         QuizView.vue + 三种题型组件
@@ -128,3 +128,8 @@ src/
 ├─ types/          dsl/ + stage/action/chat/provider/agent
 └─ utils/          geometry/iframe/line-path/playback-navigation/quiz-check/slide-style/viewport-fit
 ```
+
+> 补充（2026-08-12）：迁移时还需携带：
+> - `public/audio/*.mp3`（课堂语音，按 speech 动作 id 命名）；
+> - mock 数据中的 `audioUrl: '/audio/<id>.mp3'` 依赖该目录；
+> - `src/api/mock/` 现仅剩 `chat-sse.ts`（TTS mock 已删除）。

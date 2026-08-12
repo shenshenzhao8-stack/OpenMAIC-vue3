@@ -179,17 +179,16 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 - 原项目文件对照：lib/utils/iframe.ts、lib/store/interactive-iframe-pool.ts、interactive-renderer.tsx、InteractiveIframeHost.tsx。
 - 验收：交互页显示 iframe；切走再切回状态不丢；测试 52/52。
 
-### Phase 7 · 语音文字同步
+### Phase 7 · 语音文字同步 ✅ 已完成（2026-08-12）
 
-- 目标：字幕逐字 + 语音 + 聚光按剧本同步。
+- 目标：字幕逐字 + 语音 + 特效按剧本同步。
 - 需求规划：
-  1. 播放主路径：`AudioPlayer.play(audioId/audioUrl)` 直接播后台音频（T-01 若后台自带音频）；
-  2. 无音频兜底：朗读计时（timing.ts 已搬）+ 浏览器 TTS；
-  3. `useDiscussionTTS` composable（组合式函数）（React→Vue）：语音队列 + 封口入队 + shouldHold；
-  4. 字幕接线：`onSpeechStart` → 逐字揭示；`segmentDone` 放行。
-- 原项目文件对照：`engine.ts`（已搬）、`audio-player.ts`（已搬）、`timing.ts`（已搬）、
-  `lib/hooks/use-discussion-tts.ts`（改写 composable（组合式函数））、`stream-buffer.ts`（已搬）。
-- 验收：播放时字幕逐字出现、音频播完才进下一句、聚光穿插在句间；暂停/恢复/倍速可用。
+  1. 字幕逐字：onSpeechStart → StreamBuffer（打字机）pushText+seal → onTextReveal 逐字更新；
+  2. 倍速：顶栏循环切换（0.75-2）+ AudioPlayer 实时同步；
+  3. 语音：后台音频（AudioPlayer）或朗读计时/浏览器 TTS 兜底；
+  4. useDiscussionTTS 推迟到 Phase 8（唯一调用方是问答 UI，避免死代码；T-03 决定形态）。
+- 原项目文件对照：PlaybackChromeRoot.tsx（引擎接线）、use-discussion-tts.ts（推迟）、stream-buffer.ts（已搬）。
+- 验收：字幕逐字出现、音频播完才进下一句、特效穿插；暂停/恢复/倍速可用；测试 53/53。
 
 ### Phase 8 · 互动闭环（登录用户 ↔ 老师多轮问答）
 
@@ -258,8 +257,8 @@ mock/classroom.ts → client.getClassroom() → StageStore（stage/scenes/curren
 | 4.1 | laser 激光笔 + slide 元素收敛四类 | ✅ | 待人工审核后提交（规则五：未提交） |
 | 5 | Quiz 场景 | ✅ | 待人工审核后提交（规则五：未提交） |
 | 6 | Interactive 场景 | ✅ | 待人工审核后提交（规则五：未提交） |
-| 7 | 语音文字同步 | ⏳ 下一步 | - |
-| 8 | 互动闭环 | ⏳ | - |
+| 7 | 语音文字同步 | ✅ | 待人工审核后提交（规则五：未提交） |
+| 8 | 互动闭环 | ⏳ 下一步 | - |
 | 9 | 打磨验收 | ⏳ | - |
 
 ### Phase 4.1 · laser 激光笔 + slide 元素收敛四类 ✅ 已完成（2026-08-11）

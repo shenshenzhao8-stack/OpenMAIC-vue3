@@ -58,3 +58,6 @@
 - [REFERENCE-PHASE-6.md](./REFERENCE-PHASE-6.md)：Phase 6 工作参考手册（逐文件/逐方法业务讲解）
 
 - [MIGRATION-GUIDE.md](./MIGRATION-GUIDE.md)：迁移到另一个 Vue3 项目的说明与注意事项
+
+- [PHASE-7.md](./PHASE-7.md)：语音文字同步（字幕逐字 + 倍速）
+- [REFERENCE-PHASE-7.md](./REFERENCE-PHASE-7.md)：Phase 7 工作参考手册（逐文件/逐方法业务讲解）

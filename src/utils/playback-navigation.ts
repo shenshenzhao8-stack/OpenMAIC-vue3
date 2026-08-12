@@ -36,3 +36,19 @@ export function getAdjacentSceneId(
 export function getFirstSceneId(scenes: readonly Scene[]): string | null {
   return scenes[0]?.id ?? null
 }
+
+/**
+ * 取「当前场景」构成的单例数组（供播放引擎使用）。
+ *
+ * 对应原项目：components/edit/PlaybackChromeRoot.tsx —— 引擎按 `[currentScene]` 创建，
+ * 每节课（场景）独立播放，播完即停，切场景由 UI 驱动（不会自动连播整堂课）。
+ *
+ * @returns 含当前场景的单元素数组；当前场景不存在时返回空数组
+ */
+export function getSceneForPlayback(
+  scenes: readonly Scene[],
+  currentSceneId: string | null,
+): Scene[] {
+  const scene = scenes.find((s) => s.id === currentSceneId)
+  return scene ? [scene] : []
+}

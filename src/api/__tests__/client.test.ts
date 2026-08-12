@@ -86,3 +86,28 @@ describe('mock 课堂 slide 元素类型', () => {
     expect(elementTypes).toEqual(new Set(['text', 'shape', 'line', 'image']))
   })
 })
+
+describe('mock 课堂 speech 音频（2026-08-12：数据自带 mp3）', () => {
+  it('每个 speech 动作都带 mp3 audioUrl（真实语音按动作 id 提供）', async () => {
+    const { scenes } = await getClassroom('demo')
+    for (const scene of scenes) {
+      for (const action of scene.actions ?? []) {
+        if (action.type === 'speech') {
+          expect(action.audioUrl).toBeTruthy()
+          expect(action.audioUrl).toMatch(/^\/audio\/.*\.mp3$/)
+        }
+      }
+    }
+  })
+
+  it('d1 的台词文本为正常讲解内容（修复误填文件路径）', async () => {
+    const { scenes } = await getClassroom('demo')
+    const d1 = scenes
+      .flatMap((s) => s.actions ?? [])
+      .find((a) => a.id === 'd1')
+    expect(d1?.type).toBe('speech')
+    if (d1 && d1.type === 'speech') {
+      expect(d1.text).toContain('总结一下')
+    }
+  })
+})

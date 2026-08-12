@@ -1,10 +1,12 @@
 <!--
   文件头：课堂顶栏控制
-  对应原项目：components/stage/header-controls.tsx（简化版：去掉导出/设置/主题等，仅保留播放控制）
-  功能：播放 / 暂停 / 继续 / 停止 + 上一页 / 下一页 + 当前引擎状态展示。
-  按钮行为由 ClassroomPage 通过 props 注入（引擎实例唯一，避免多处创建）。
+  对应原项目：components/stage/header-controls.tsx（简化版：仅保留播放控制 + 倍速）
+  功能：播放 / 暂停 / 继续 / 停止 + 上一页 / 下一页 + 倍速下拉框 + 引擎状态展示。
+  按钮行为由 ClassroomPage 通过 props 注入（引擎实例唯一）；倍速用下拉框选择，
+  写入 settings store（引擎/AudioPlayer 实时生效）。
 -->
 <script setup lang="ts">
+import { useSettingsStore } from '@/stores/settings'
 import type { EngineMode } from '@/core/playback/types'
 
 defineProps<{
@@ -16,6 +18,17 @@ defineProps<{
   onNext: () => void
   onPrev: () => void
 }>()
+
+const settings = useSettingsStore()
+
+/** 可选倍速档位 */
+const SPEED_OPTIONS = [0.75, 1, 1.25, 1.5, 2]
+
+/** 下拉框选择倍速 → 写入 settings（引擎/AudioPlayer 实时生效） */
+function onSpeedChange(event: Event) {
+  const value = Number((event.target as HTMLSelectElement).value)
+  settings.setPlaybackSpeed(value)
+}
 </script>
 
 <template>
@@ -26,6 +39,13 @@ defineProps<{
     <button v-else-if="mode === 'paused'" type="button" class="btn primary" @click="onResume">继续</button>
     <button v-else type="button" class="btn" disabled>{{ mode }}</button>
     <button v-if="mode !== 'idle'" type="button" class="btn" @click="onStop">停止</button>
+    <!-- 倍速下拉框 -->
+    <label class="speed-label">
+      倍速
+      <select class="speed-select" :value="settings.playbackSpeed" @change="onSpeedChange">
+        <option v-for="s in SPEED_OPTIONS" :key="s" :value="s">×{{ s }}</option>
+      </select>
+    </label>
     <button type="button" class="btn" title="下一页" @click="onNext">→</button>
     <span class="mode-badge">状态：{{ mode }}</span>
   </div>
@@ -59,6 +79,21 @@ defineProps<{
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+.speed-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: #475569;
+}
+.speed-select {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.85rem;
+  background: #fff;
+  cursor: pointer;
 }
 .mode-badge {
   font-size: 0.75rem;

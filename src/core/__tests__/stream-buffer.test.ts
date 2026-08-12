@@ -69,3 +69,44 @@ describe('StreamBuffer（打字机队列）', () => {
     buffer.dispose()
   })
 })
+
+describe('StreamBuffer（讲课字幕逐字揭示）', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('pushText + sealText 后逐字揭示到完整文本（模拟 onSpeechStart 流程）', async () => {
+    vi.useFakeTimers()
+
+    const reveals: string[] = []
+    const buffer = new StreamBuffer(
+      {
+        onAgentStart: () => {},
+        onAgentEnd: () => {},
+        onTextReveal: (_messageId, _partId, revealedText) => {
+          reveals.push(revealedText)
+        },
+        onActionReady: () => Promise.resolve(),
+        onLiveSpeech: () => {},
+        onSpeechProgress: () => {},
+        onThinking: () => {},
+        onCueUser: () => {},
+        onDone: () => {},
+        onError: () => {},
+      },
+      { tickMs: 30 },
+    )
+    buffer.start()
+    // 模拟引擎 onSpeechStart：推入一句并封口（讲课字幕不依赖 agent_end 事件）
+    buffer.pushText('lecture-1', '光合作用', 'default-1')
+    buffer.sealText('lecture-1')
+    vi.advanceTimersByTime(30 * 10)
+    await Promise.resolve()
+    await Promise.resolve()
+    // 最后一次揭示应为完整文本
+    expect(reveals[reveals.length - 1]).toBe('光合作用')
+    // 揭示次数 = 字符数（4 个字符逐字）
+    expect(reveals).toEqual(['光', '光合', '光合作', '光合作用'])
+    buffer.dispose()
+  })
+})

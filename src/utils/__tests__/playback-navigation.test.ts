@@ -6,7 +6,7 @@
  * 功能：验证上一页/下一页/首页计算逻辑（首尾越界返回 null）。
  */
 import { describe, it, expect } from 'vitest'
-import { getAdjacentSceneId, getFirstSceneId } from '@/utils/playback-navigation'
+import { getAdjacentSceneId, getFirstSceneId, getSceneForPlayback } from '@/utils/playback-navigation'
 import type { Scene } from '@/types/stage'
 
 /** 构造最小场景（仅 id/type/title 用于导航计算） */
@@ -48,5 +48,20 @@ describe('播放导航纯函数', () => {
     expect(getAdjacentSceneId(scenes, 'c', 1)).toBeNull()
     expect(getAdjacentSceneId([], 'a', 1)).toBeNull()
     expect(getAdjacentSceneId(scenes, 'not-exist', 1)).toBeNull()
+  })
+})
+
+describe('getSceneForPlayback（按场景播放，对应原项目 [currentScene]）', () => {
+  const scenes = [makeScene('a'), makeScene('b'), makeScene('c')]
+
+  it('当前场景存在时返回单元素数组', () => {
+    const result = getSceneForPlayback(scenes, 'b')
+    expect(result).toHaveLength(1)
+    expect(result[0].id).toBe('b')
+  })
+
+  it('当前场景不存在（或为空）时返回空数组', () => {
+    expect(getSceneForPlayback(scenes, 'not-exist')).toHaveLength(0)
+    expect(getSceneForPlayback([], 'a')).toHaveLength(0)
   })
 })

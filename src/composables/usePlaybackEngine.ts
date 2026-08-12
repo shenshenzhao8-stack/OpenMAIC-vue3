@@ -1,28 +1,30 @@
 /**
- * 文件头：播放引擎接线 composable（组合式函数）
+ * 文件头：播放引擎接线（composable）
  *
  * 对应原项目：components/edit/PlaybackChromeRoot.tsx（创建 PlaybackEngine/ActionEngine/
  * AudioPlayer 并接回调）与 components/stage.tsx（播放/编辑模式分发，本项目仅播放）。
  *
- * 功能：把纯 TS 的 PlaybackEngine 接到 Vue 响应式状态：
- *   - 状态：mode（idle/playing/paused/live）、lectureSpeech（当前讲解台词，字幕用）；
- *   - 动作：play / pause / resume / stop / nextScene / prevScene；
- *   - 回调接线：onModeChange → mode；onSceneChange → stageStore.setCurrentSceneId（翻页）；
- *     onSpeechStart → lectureSpeech（字幕）；getPlaybackSpeed → settings；
- *   - 清理：组件卸载时停止引擎并销毁音频。
+ * 功能（Phase 7 更新 + 2026-08-12 修复）：
+ *   - ★ 按当前场景播放：引擎每次只接收「当前场景」单例数组（与原项目 [currentScene]
+ *     一致）——每个场景独立播放，播完即停，不自动连播整堂课（问题 2 修复）；
+ *   - 切场景：watch currentSceneId → 重建当前场景引擎（新场景从头播放）；
+ *   - 字幕逐字：onSpeechStart → StreamBuffer 打字机 pushText + sealText → onTextReveal 逐字更新；
+ *   - 语音：AudioPlayer 播放（mock 已填充模拟音频，暂停/恢复精确续播）；无音频时
+ *     由引擎走朗读计时 / 浏览器 TTS 兜底（该兜底整句重讲，与原文案一致）；
+ *   - 倍速：settings.playbackSpeed 变化实时同步到 AudioPlayer.playbackRate。
  *
- * 说明（Phase 3 简化）：
- *   - 引擎在首次 play 时按当前 scenes 创建；手动「上一页/下一页」只改展示中的场景，
- *     引擎游标独立（后续 Phase 7/8 再对接 jumpToAction / 讨论打断恢复）。
- *   - 互动（学生提问打断讲课）在 Phase 8 接入 handleUserInterrupt。
+ * 说明：
+ *   - useDiscussionTTS 推迟到 Phase 8（唯一调用方是问答 UI）；
+ *   - 手动翻页（nextScene/prevScene）切 currentSceneId → watcher 重建引擎。
  */
-import { ref, readonly, onBeforeUnmount } from 'vue'
+import { ref, readonly, watch, onBeforeUnmount } from 'vue'
 import { useStageStore } from '@/stores/stage'
 import { useSettingsStore } from '@/stores/settings'
 import { PlaybackEngine } from '@/core/playback/engine'
 import { ActionEngine } from '@/core/action/engine'
 import { createAudioPlayer, type AudioPlayer } from '@/core/audio/audio-player'
-import { getAdjacentSceneId } from '@/utils/playback-navigation'
+import { StreamBuffer } from '@/core/buffer/stream-buffer'
+import { getAdjacentSceneId, getSceneForPlayback } from '@/utils/playback-navigation'
 import type { EngineMode } from '@/core/playback/types'
 
 export function usePlaybackEngine() {
@@ -31,51 +33,114 @@ export function usePlaybackEngine() {
 
   // 引擎状态（响应式，供 UI 显示与按钮切换）
   const mode = ref<EngineMode>('idle')
-  // 当前讲解台词（字幕；保留到下一句替换）
+  // 当前讲解台词（字幕；由打字机逐字更新，保留到下一句替换）
   const lectureSpeech = ref<string | null>(null)
 
   let audioPlayer: AudioPlayer | null = null
   let engine: PlaybackEngine | null = null
+  /** 字幕打字机（逐字揭示） */
+  let subtitleBuffer: StreamBuffer | null = null
+  /** 字幕消息计数（生成唯一 messageId） */
+  let speechCounter = 0
+  /** 当前引擎所属场景 id（用于判断是否需要重建） */
+  let engineSceneId: string | null = null
 
-  /** 懒创建引擎：首次播放时按当前 scenes 创建（数据已加载的前提） */
-  function ensureEngine(): PlaybackEngine | null {
-    if (engine) return engine
-    if (stageStore.scenes.length === 0) return null
+  /** 销毁旧引擎及附属资源（切场景/卸载时调用） */
+  function teardownEngine() {
+    engine?.stop()
+    engine = null
+    engineSceneId = null
+    subtitleBuffer?.dispose()
+    subtitleBuffer = null
+    audioPlayer?.destroy()
+    audioPlayer = null
+    speechCounter = 0
+    lectureSpeech.value = null
+    mode.value = 'idle'
+  }
+
+  /** 为「当前场景」创建新引擎（每次只传单场景数组，播完即停） */
+  function buildEngine(): PlaybackEngine | null {
+    const scene = stageStore.currentScene
+    if (!scene) return null
+    engineSceneId = stageStore.currentSceneId
 
     audioPlayer = createAudioPlayer()
+    audioPlayer.setPlaybackRate(settingsStore.playbackSpeed)
+
+    // 字幕打字机
+    subtitleBuffer = new StreamBuffer(
+      {
+        onTextReveal: (_messageId, _partId, revealedText) => {
+          lectureSpeech.value = revealedText
+        },
+        onAgentStart: () => {},
+        onAgentEnd: () => {},
+        onActionReady: () => Promise.resolve(),
+        onLiveSpeech: () => {},
+        onSpeechProgress: () => {},
+        onThinking: () => {},
+        onCueUser: () => {},
+        onDone: () => {},
+        onError: () => {},
+      },
+      { tickMs: 30, charsPerTick: 1 },
+    )
+    subtitleBuffer.start()
+
     const actionEngine = new ActionEngine(audioPlayer)
-    engine = new PlaybackEngine(stageStore.scenes, actionEngine, audioPlayer, {
-      // 状态机变化 → 响应式 mode
+    // ★ 单场景数组：当前场景的剧本独立播放（对应原项目 [currentScene]）
+    engine = new PlaybackEngine(getSceneForPlayback(stageStore.scenes, stageStore.currentSceneId), actionEngine, audioPlayer, {
       onModeChange: (next) => {
         mode.value = next
       },
-      // 引擎推进到新场景 → 同步 stage store（翻页的唯一入口）
-      onSceneChange: (sceneId) => {
-        stageStore.setCurrentSceneId(sceneId)
-      },
-      // 一句台词开始 → 字幕
       onSpeechStart: (text) => {
-        lectureSpeech.value = text
+        speechCounter += 1
+        const id = `lecture-${speechCounter}`
+        subtitleBuffer?.pushText(id, text, 'default-1')
+        subtitleBuffer?.sealText(id)
       },
-      // 播放倍速从 settings 读取
+      onSpeechEnd: () => {},
       getPlaybackSpeed: () => settingsStore.playbackSpeed,
-      // 无多角色讨论：所有讨论动作视为已选中（实际不会产出 discussion 动作）
       isAgentSelected: () => true,
     })
     return engine
   }
 
-  /** 开始播放（idle → playing） */
+  /** 确保引擎存在且对应当前场景；否则重建 */
+  function ensureEngine(): PlaybackEngine | null {
+    if (engine && engineSceneId === stageStore.currentSceneId) return engine
+    teardownEngine()
+    return buildEngine()
+  }
+
+  /** 切场景：销毁旧引擎（新场景从头播放，不自动连播） */
+  watch(
+    () => stageStore.currentSceneId,
+    () => {
+      teardownEngine()
+    },
+  )
+
+  /** 倍速实时同步到 AudioPlayer（播放中立即生效） */
+  watch(
+    () => settingsStore.playbackSpeed,
+    (rate) => {
+      audioPlayer?.setPlaybackRate(rate)
+    },
+  )
+
+  /** 开始播放当前场景（idle → playing） */
   function play() {
     ensureEngine()?.start()
   }
 
-  /** 暂停 */
+  /** 暂停（有音频：精确暂停，可续播） */
   function pause() {
     engine?.pause()
   }
 
-  /** 恢复 */
+  /** 恢复（有音频：从暂停处精确续播） */
   function resume() {
     engine?.resume()
   }
@@ -86,7 +151,7 @@ export function usePlaybackEngine() {
     lectureSpeech.value = null
   }
 
-  /** 手动翻页：下一页（仅改展示场景，见文件头说明） */
+  /** 手动翻页：下一页（切 currentSceneId → watcher 重建引擎） */
   function nextScene() {
     const id = getAdjacentSceneId(stageStore.scenes, stageStore.currentSceneId, 1)
     if (id) stageStore.setCurrentSceneId(id)
@@ -98,10 +163,9 @@ export function usePlaybackEngine() {
     if (id) stageStore.setCurrentSceneId(id)
   }
 
-  // 卸载清理：停止引擎、销毁音频（防止定时器/音频泄漏）
+  // 卸载清理
   onBeforeUnmount(() => {
-    engine?.stop()
-    audioPlayer?.destroy()
+    teardownEngine()
   })
 
   return {
