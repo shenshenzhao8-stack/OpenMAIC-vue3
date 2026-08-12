@@ -4,7 +4,7 @@
 -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { QuizQuestion } from '@/types/stage'
+import type { QuizQuestion } from '#/types/stage'
 
 const props = defineProps<{
   question: QuizQuestion

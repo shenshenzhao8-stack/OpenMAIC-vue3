@@ -14,14 +14,14 @@
 -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { ChatMessage } from '@/composables/useChatSession'
-import { useSpeechRecognition } from '@/composables/useSpeechRecognition'
+import type { ChatMessage } from '#/composables/useChatSession'
+import { useSpeechRecognition } from '#/composables/useSpeechRecognition'
 import {
   buildLectureNotes,
   getLectureActionLabel,
   type LectureNoteEntry,
-} from '@/utils/lecture-notes'
-import type { Scene } from '@/types/stage'
+} from '#/utils/lecture-notes'
+import type { Scene } from '#/types/stage'
 
 const props = defineProps<{
   messages: ChatMessage[]

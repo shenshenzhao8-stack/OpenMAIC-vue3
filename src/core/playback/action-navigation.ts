@@ -10,7 +10,7 @@
  *   - canJumpWithinReconstructablePrefix：跳转可行性（引擎 jumpToAction 使用）；
  *   - buildActionNavigationTargets 等：台词行号与前后跳转目标。
  */
-import type { Action } from '@/types/action'
+import type { Action } from '#/types/action'
 
 /** 动作导航目标 */
 export interface ActionNavigationTarget {

@@ -6,7 +6,7 @@
  * 功能：验证补丁注入位置（<head> 后 / <head attr> 后 / 前插）与注入内容。
  */
 import { describe, it, expect } from 'vitest'
-import { patchHtmlForIframe } from '@/utils/iframe'
+import { patchHtmlForIframe } from '#/utils/iframe'
 
 describe('patchHtmlForIframe', () => {
   it('注入到 <head> 之后，且包含三个补丁', () => {

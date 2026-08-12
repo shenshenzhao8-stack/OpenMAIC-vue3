@@ -15,14 +15,14 @@
  *     handleJumpToAction）。
  */
 import { ref, readonly, computed, watch, onBeforeUnmount } from 'vue'
-import { useStageStore } from '@/stores/stage'
-import { useSettingsStore } from '@/stores/settings'
-import { PlaybackEngine } from '@/core/playback/engine'
-import { ActionEngine } from '@/core/action/engine'
-import { createAudioPlayer, type AudioPlayer } from '@/core/audio/audio-player'
-import { StreamBuffer } from '@/core/buffer/stream-buffer'
-import { getAdjacentSceneId, getSceneForPlayback } from '@/utils/playback-navigation'
-import type { EngineMode } from '@/core/playback/types'
+import { useStageStore } from '#/stores/stage'
+import { useSettingsStore } from '#/stores/settings'
+import { PlaybackEngine } from '#/core/playback/engine'
+import { ActionEngine } from '#/core/action/engine'
+import { createAudioPlayer, type AudioPlayer } from '#/core/audio/audio-player'
+import { StreamBuffer } from '#/core/buffer/stream-buffer'
+import { getAdjacentSceneId, getSceneForPlayback } from '#/utils/playback-navigation'
+import type { EngineMode } from '#/core/playback/types'
 
 export function usePlaybackEngine() {
   const stageStore = useStageStore()

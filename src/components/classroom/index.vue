@@ -15,27 +15,26 @@
     4. 对外发布 load-success / load-error 事件，供宿主感知加载结果。
 
   范围说明：本阶段只做组件化与课程切换清理，不重写 Store / PlaybackEngine /
-  composables；`@/` 别名迁移留待 Phase 2。
+  composables；`@/` → `#/` 内部引用迁移已在 Phase 2 完成。
 -->
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import { useStageStore } from '@/stores/stage'
-import { useInteractiveIframePool } from '@/stores/interactive-iframe-pool'
-import { getClassroom, type ClassroomData } from '@/api/client'
-import { getFirstSceneId } from '@/utils/playback-navigation'
-import { usePlaybackEngine } from '@/composables/usePlaybackEngine'
-import { useChatSession } from '@/composables/useChatSession'
-import HeaderControls from '@/components/stage/HeaderControls.vue'
-import SceneSidebar from '@/components/stage/SceneSidebar.vue'
-import SceneProvider from '@/components/stage/SceneProvider.vue'
-import SceneRenderer from '@/components/stage/SceneRenderer.vue'
-import InteractiveIframeHost from '@/components/scenes/interactive/InteractiveIframeHost.vue'
-import ChatArea from '@/components/chat/ChatArea.vue'
+import type { OpenMaicClassroomProps } from '#/types/public'
+import { useStageStore } from '#/stores/stage'
+import { useInteractiveIframePool } from '#/stores/interactive-iframe-pool'
+import { getClassroom, type ClassroomData } from '#/api/client'
+import { getFirstSceneId } from '#/utils/playback-navigation'
+import { usePlaybackEngine } from '#/composables/usePlaybackEngine'
+import { useChatSession } from '#/composables/useChatSession'
+import HeaderControls from '#/components/stage/HeaderControls.vue'
+import SceneSidebar from '#/components/stage/SceneSidebar.vue'
+import SceneProvider from '#/components/stage/SceneProvider.vue'
+import SceneRenderer from '#/components/stage/SceneRenderer.vue'
+import InteractiveIframeHost from '#/components/scenes/interactive/InteractiveIframeHost.vue'
+import ChatArea from '#/components/chat/ChatArea.vue'
 
-/** 组件 props：课堂 id（替代路由参数，脱离 vue-router） */
-const props = defineProps<{
-  classroomId: string
-}>()
+/** 组件 props：课堂 id（替代路由参数，脱离 vue-router；类型来自公共契约） */
+const props = defineProps<OpenMaicClassroomProps>()
 
 /** 对外事件：加载成功返回课堂数据；加载失败返回原始错误 */
 const emit = defineEmits<{

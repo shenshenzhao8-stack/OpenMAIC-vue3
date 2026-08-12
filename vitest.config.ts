@@ -11,14 +11,20 @@
  */
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@openmaic/dsl': fileURLToPath(new URL('./src/types/dsl/index.ts', import.meta.url)),
-    },
+    alias: [
+      // 与 vite.config 一致：正则替换需带尾部斜杠
+      { find: /^#\//, replacement: `${fileURLToPath(new URL('./src', import.meta.url))}/` },
+      {
+        find: '@openmaic/dsl',
+        replacement: fileURLToPath(new URL('./src/types/dsl/index.ts', import.meta.url)),
+      },
+    ],
   },
+  plugins: [vue()],
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],

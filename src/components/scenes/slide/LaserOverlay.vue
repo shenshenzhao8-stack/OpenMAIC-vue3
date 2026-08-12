@@ -8,9 +8,9 @@
 -->
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
-import { useCanvasStore } from '@/stores/canvas'
-import { useScene } from '@/composables/useScene'
-import { findElementGeometry } from '@/utils/geometry'
+import { useCanvasStore } from '#/stores/canvas'
+import { useScene } from '#/composables/useScene'
+import { findElementGeometry } from '#/utils/geometry'
 
 const canvasStore = useCanvasStore()
 const { scene } = useScene()

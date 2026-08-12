@@ -4,7 +4,7 @@
  * 功能：验证串行播放、segmentDone 计数、shouldHold 状态机、reset。
  */
 import { describe, it, expect } from 'vitest'
-import { createTtsQueue, type TtsQueueItem } from '@/utils/tts-queue'
+import { createTtsQueue, type TtsQueueItem } from '#/utils/tts-queue'
 
 describe('createTtsQueue（语音队列）', () => {
   it('串行播放：一段播完才播下一段', () => {

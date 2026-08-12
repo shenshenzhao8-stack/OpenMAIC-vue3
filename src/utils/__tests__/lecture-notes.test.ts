@@ -8,8 +8,8 @@
  *   - 空动作场景被过滤；徽章文案映射正确。
  */
 import { describe, it, expect } from 'vitest'
-import { buildLectureNotes, getLectureActionLabel } from '@/utils/lecture-notes'
-import type { Scene } from '@/types/stage'
+import { buildLectureNotes, getLectureActionLabel } from '#/utils/lecture-notes'
+import type { Scene } from '#/types/stage'
 
 /** 构造最小 slide 场景（仅讲义构建需要的字段） */
 function makeScene(id: string, order: number, actions: Scene['actions']): Scene {

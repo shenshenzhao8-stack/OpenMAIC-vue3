@@ -7,11 +7,11 @@
 -->
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { Scene, QuizQuestion } from '@/types/stage'
+import type { Scene, QuizQuestion } from '#/types/stage'
 import SingleChoiceQuestion from './SingleChoiceQuestion.vue'
 import MultipleChoiceQuestion from './MultipleChoiceQuestion.vue'
 import ShortAnswerQuestion from './ShortAnswerQuestion.vue'
-import { isChoiceCorrect, isQuestionAnswered } from '@/utils/quiz-check'
+import { isChoiceCorrect, isQuestionAnswered } from '#/utils/quiz-check'
 
 const props = defineProps<{ scene: Scene | null }>()
 

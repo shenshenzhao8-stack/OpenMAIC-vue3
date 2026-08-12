@@ -9,7 +9,7 @@
  *   - canvasPercentage 限制画布占比。
  */
 import { describe, it, expect } from 'vitest'
-import { computeSlideViewportFit } from '@/utils/viewport-fit'
+import { computeSlideViewportFit } from '#/utils/viewport-fit'
 
 describe('computeSlideViewportFit', () => {
   it('16:9 容器（1280×720）满宽满高', () => {

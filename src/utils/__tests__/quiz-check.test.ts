@@ -6,8 +6,8 @@
  * 功能：验证单选题/多选题对错判断与"是否已作答"判断。
  */
 import { describe, it, expect } from 'vitest'
-import { isChoiceCorrect, isQuestionAnswered } from '@/utils/quiz-check'
-import type { QuizQuestion } from '@/types/stage'
+import { isChoiceCorrect, isQuestionAnswered } from '#/utils/quiz-check'
+import type { QuizQuestion } from '#/types/stage'
 
 const single: QuizQuestion = {
   id: 'q1',

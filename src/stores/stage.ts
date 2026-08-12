@@ -15,7 +15,7 @@
  * 供后续场景渲染器与播放引擎接线使用。
  */
 import { defineStore } from 'pinia'
-import type { Scene, Stage, StageMode } from '@/types/stage'
+import type { Scene, Stage, StageMode } from '#/types/stage'
 
 /** stage store 状态 */
 interface StageState {

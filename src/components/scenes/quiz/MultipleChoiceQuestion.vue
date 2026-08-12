@@ -3,7 +3,7 @@
   功能：多选（checkbox 样式）；复盘时展示对错徽标，选项禁用。
 -->
 <script setup lang="ts">
-import type { QuizQuestion } from '@/types/stage'
+import type { QuizQuestion } from '#/types/stage'
 
 const props = defineProps<{
   question: QuizQuestion

@@ -21,8 +21,8 @@
  *   - 无音频时用朗读时长估算兜底（estimateSpeechDurationMs），保证节奏不卡；
  *   - 浏览器 TTS 用 cancel+重讲处理暂停/恢复（Firefox 兼容）。
  */
-import type { Scene } from '@/types/stage'
-import type { Action, SpeechAction, DiscussionAction } from '@/types/action'
+import type { Scene } from '#/types/stage'
+import type { Action, SpeechAction, DiscussionAction } from '#/types/action'
 import type {
   EngineMode,
   TopicState,
@@ -31,21 +31,21 @@ import type {
   TriggerEvent,
   Effect,
 } from './types'
-import type { AudioPlayer } from '@/core/audio/audio-player'
-import { ActionEngine } from '@/core/action/engine'
+import type { AudioPlayer } from '#/core/audio/audio-player'
+import { ActionEngine } from '#/core/action/engine'
 import {
   resolvePlaybackCursor,
   estimateSpeechDurationMs,
   DISCUSSION_TRIGGER_DELAY_MS,
-} from '@/core/choreography'
+} from '#/core/choreography'
 import {
   canJumpWithinReconstructablePrefix,
   isWhiteboardPlaybackAction,
 } from './action-navigation'
-import { useCanvasStore } from '@/stores/canvas'
-import { useSettingsStore } from '@/stores/settings'
-import { isTTSProviderEnabled } from '@/core/audio/provider-enablement'
-import { createLogger } from '@/core/logger'
+import { useCanvasStore } from '#/stores/canvas'
+import { useSettingsStore } from '#/stores/settings'
+import { isTTSProviderEnabled } from '#/core/audio/provider-enablement'
+import { createLogger } from '#/core/logger'
 
 const log = createLogger('PlaybackEngine')
 
@@ -618,7 +618,7 @@ export class PlaybackEngine {
 
         // 无预生成音频（TTS 关闭）时，按文字长度估算「念完」所需时间（阅读计时）：
         // 估算规则（CJK 按字 / 英文按词、下限 2s、随倍速调整）统一放在
-        // @/core/choreography，保证与（原项目）视频导出一致；暂停时取消，恢复时直接
+        // #/core/choreography，保证与（原项目）视频导出一致；暂停时取消，恢复时直接
         // processNext 继续。
         const scheduleReadingTimer = () => {
           if (!this.isCurrentGeneration(generation)) return

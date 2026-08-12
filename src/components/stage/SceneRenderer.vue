@@ -4,10 +4,10 @@
   功能：按当前场景的 type 分发到对应渲染组件（slide/quiz/interactive）。
 -->
 <script setup lang="ts">
-import { useScene } from '@/composables/useScene'
-import SlideView from '@/components/scenes/slide/SlideView.vue'
-import QuizView from '@/components/scenes/quiz/QuizView.vue'
-import InteractiveRenderer from '@/components/scenes/interactive/InteractiveRenderer.vue'
+import { useScene } from '#/composables/useScene'
+import SlideView from '#/components/scenes/slide/SlideView.vue'
+import QuizView from '#/components/scenes/quiz/QuizView.vue'
+import InteractiveRenderer from '#/components/scenes/interactive/InteractiveRenderer.vue'
 
 const { scene } = useScene()
 </script>

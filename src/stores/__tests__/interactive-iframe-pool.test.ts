@@ -7,7 +7,7 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useInteractiveIframePool, IFRAME_POOL_CAP } from '@/stores/interactive-iframe-pool'
+import { useInteractiveIframePool, IFRAME_POOL_CAP } from '#/stores/interactive-iframe-pool'
 
 describe('交互 iframe 保活池', () => {
   beforeEach(() => {

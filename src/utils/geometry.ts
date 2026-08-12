@@ -9,7 +9,7 @@
  *   - findElementGeometry：按场景与元素 id 查找并计算百分比几何；
  *   - findNearestCorner：返回距元素中心最近的画布角落（0-100）。
  */
-import type { PPTElement, PercentageGeometry } from '@/types/dsl'
+import type { PPTElement, PercentageGeometry } from '#/types/dsl'
 
 /**
  * 计算元素的百分比几何（0-100 坐标系）。

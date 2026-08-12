@@ -18,9 +18,9 @@
  * 纯 TS、零框架依赖，通过回调注入（fetchChat / getStoreState / onEvent）与环境解耦，
  * 前端（Vue）与 eval 测试共用同一套循环。
  */
-import type { StatelessEvent, DirectorState } from '@/types/chat'
-import type { ThinkingConfig } from '@/types/provider'
-import { createLogger } from '@/core/logger'
+import type { StatelessEvent, DirectorState } from '#/types/chat'
+import type { ThinkingConfig } from '#/types/provider'
+import { createLogger } from '#/core/logger'
 
 const log = createLogger('AgentLoop')
 

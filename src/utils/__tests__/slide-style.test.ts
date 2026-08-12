@@ -10,8 +10,8 @@ import {
   resolveSlideBackgroundStyle,
   resolveElementShadow,
   resolveElementFilters,
-} from '@/utils/slide-style'
-import type { SlideBackground } from '@/types/dsl'
+} from '#/utils/slide-style'
+import type { SlideBackground } from '#/types/dsl'
 
 describe('resolveSlideBackgroundStyle', () => {
   it('无背景默认白色', () => {

@@ -8,7 +8,7 @@
  * 支持外部传入容器 ref（页面组件自建 ref 并绑定模板），便于脚本引用。
  */
 import { ref, computed, onMounted, onBeforeUnmount, type Ref, type ComputedRef } from 'vue'
-import { computeSlideViewportFit, type SlideViewportFit } from '@/utils/viewport-fit'
+import { computeSlideViewportFit, type SlideViewportFit } from '#/utils/viewport-fit'
 
 export interface UseViewportSizeResult {
   /** 容器 ref（未传入外部 ref 时由本 composable（组合式函数） 自建） */

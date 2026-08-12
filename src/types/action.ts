@@ -4,8 +4,8 @@
  * 对应原项目：lib/types/action.ts
  *
  * 原项目该文件的功能：把 @openmaic/dsl 的动作类型与运行时常量重新导出，
- * 让应用内代码统一从 '@/lib/types/action' 引用。
- * 本项目做同样的事：统一从 '@/types/action' 引用，避免散落各处直接 import dsl。
+ * 让应用内代码统一从 '#/types/action' 引用（MONOREPO Phase 2 后为包私有映射）。
+ * 本项目做同样的事：统一从 '#/types/action' 引用，避免散落各处直接 import dsl。
  */
 
 export type {

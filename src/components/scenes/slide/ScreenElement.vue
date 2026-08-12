@@ -8,7 +8,7 @@
 -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PPTElement, SlideTheme } from '@/types/dsl'
+import type { PPTElement, SlideTheme } from '#/types/dsl'
 import TextElement from './elements/TextElement.vue'
 import ShapeElement from './elements/ShapeElement.vue'
 import LineElement from './elements/LineElement.vue'

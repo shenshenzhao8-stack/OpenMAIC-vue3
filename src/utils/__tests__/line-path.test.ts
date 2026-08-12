@@ -6,8 +6,8 @@
  * 功能：验证直线/折线/双折线/二次曲线/三次曲线各分支的 d 属性。
  */
 import { describe, it, expect } from 'vitest'
-import { getLineElementPath } from '@/utils/line-path'
-import type { PPTLineElement } from '@/types/dsl'
+import { getLineElementPath } from '#/utils/line-path'
+import type { PPTLineElement } from '#/types/dsl'
 
 function makeLine(partial: Partial<PPTLineElement>): PPTLineElement {
   return {

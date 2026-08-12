@@ -10,7 +10,7 @@
 -->
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
-import { useCanvasStore } from '@/stores/canvas'
+import { useCanvasStore } from '#/stores/canvas'
 
 const canvasStore = useCanvasStore()
 

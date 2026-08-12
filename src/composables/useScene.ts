@@ -11,7 +11,7 @@
  *   - 场景组件（SceneRenderer / SlideView / QuizView ...）用 useScene() 取当前场景。
  */
 import { computed, inject, type ComputedRef, type InjectionKey } from 'vue'
-import type { Scene } from '@/types/stage'
+import type { Scene } from '#/types/stage'
 
 /** 场景上下文的值：当前场景（响应式；无场景时为 null） */
 export interface SceneContext {

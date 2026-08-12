@@ -13,8 +13,8 @@
  * 当前 mock SSE 只推文本，故用浏览器 TTS 朗读。
  */
 import { ref, onBeforeUnmount } from 'vue'
-import { useSettingsStore } from '@/stores/settings'
-import { createTtsQueue } from '@/utils/tts-queue'
+import { useSettingsStore } from '#/stores/settings'
+import { createTtsQueue } from '#/utils/tts-queue'
 
 export function useDiscussionTTS() {
   const settings = useSettingsStore()

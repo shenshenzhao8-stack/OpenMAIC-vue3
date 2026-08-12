@@ -7,7 +7,7 @@
 -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PPTShapeElement } from '@/types/dsl'
+import type { PPTShapeElement } from '#/types/dsl'
 
 const props = defineProps<{ element: PPTShapeElement }>()
 

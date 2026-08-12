@@ -21,7 +21,7 @@
  *   - pause() 是 O(1) 的，暂停只是让 tick 直接返回；
  *   - 动作只在 tick 游标到达它时触发（保证排在它前面的文字先显示完）。
  */
-import type { DirectorState } from '@/types/chat'
+import type { DirectorState } from '#/types/chat'
 
 // ─── 缓冲项类型 ───────────────────────────────────────────────
 

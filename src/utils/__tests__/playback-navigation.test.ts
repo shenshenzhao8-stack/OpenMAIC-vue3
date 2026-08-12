@@ -6,8 +6,8 @@
  * 功能：验证上一页/下一页/首页计算逻辑（首尾越界返回 null）。
  */
 import { describe, it, expect } from 'vitest'
-import { getAdjacentSceneId, getFirstSceneId, getSceneForPlayback } from '@/utils/playback-navigation'
-import type { Scene } from '@/types/stage'
+import { getAdjacentSceneId, getFirstSceneId, getSceneForPlayback } from '#/utils/playback-navigation'
+import type { Scene } from '#/types/stage'
 
 /** 构造最小场景（仅 id/type/title 用于导航计算） */
 function makeScene(id: string): Scene {

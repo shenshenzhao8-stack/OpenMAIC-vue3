@@ -28,7 +28,7 @@ import {
   isPermissionDeniedError,
   getMicrophoneErrorType,
   requestMicrophoneAccess,
-} from '@/utils/speech-recognition'
+} from '#/utils/speech-recognition'
 
 // 浏览器实验性 API 无全局类型，本地声明最小接口（对齐原项目 prompt-input.tsx）
 interface SpeechRecognition extends EventTarget {

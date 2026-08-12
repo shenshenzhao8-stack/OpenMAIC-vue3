@@ -9,7 +9,7 @@
  *   3. chatStream 返回的 SSE 流以 agent_start 开头、以 done 结尾（一问一答协议）。
  */
 import { describe, it, expect } from 'vitest'
-import { listClassrooms, getClassroom, chatStream } from '@/api/client'
+import { listClassrooms, getClassroom, chatStream } from '#/api/client'
 
 /** 解析 SSE 响应体，返回事件数组 */
 async function readSseEvents(response: Response): Promise<unknown[]> {

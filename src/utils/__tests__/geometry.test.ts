@@ -10,8 +10,8 @@ import {
   getElementPercentageGeometry,
   findElementGeometry,
   findNearestCorner,
-} from '@/utils/geometry'
-import type { PPTElement } from '@/types/dsl'
+} from '#/utils/geometry'
+import type { PPTElement } from '#/types/dsl'
 
 /** 构造一个文本元素 */
 function makeTextElement(partial?: Partial<PPTElement>): PPTElement {

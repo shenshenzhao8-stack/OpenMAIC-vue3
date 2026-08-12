@@ -11,10 +11,10 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import type { Scene } from '@/types/stage'
-import type { AudioPlayer } from '@/core/audio/audio-player'
-import { PlaybackEngine } from '@/core/playback/engine'
-import { ActionEngine } from '@/core/action/engine'
+import type { Scene } from '#/types/stage'
+import type { AudioPlayer } from '#/core/audio/audio-player'
+import { PlaybackEngine } from '#/core/playback/engine'
+import { ActionEngine } from '#/core/action/engine'
 
 /**
  * 模拟音频播放器：实现 AudioPlayer 全部接口；

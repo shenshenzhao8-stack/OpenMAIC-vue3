@@ -12,7 +12,7 @@
 -->
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, type CSSProperties } from 'vue'
-import { useInteractiveIframePool, type IframePoolEntry } from '@/stores/interactive-iframe-pool'
+import { useInteractiveIframePool, type IframePoolEntry } from '#/stores/interactive-iframe-pool'
 
 const pool = useInteractiveIframePool()
 

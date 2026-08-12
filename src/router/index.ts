@@ -9,8 +9,8 @@
  * （原 app/generation-preview/page.tsx 已不在范围内），故移除 /generate 路由。
  */
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from '@/pages/HomePage.vue'
-import ClassroomPage from '@/pages/ClassroomPage.vue'
+import HomePage from '#/pages/HomePage.vue'
+import ClassroomPage from '#/pages/ClassroomPage.vue'
 
 const router = createRouter({
   // createWebHistory：HTML5 History 模式（干净 URL，无 # 号）

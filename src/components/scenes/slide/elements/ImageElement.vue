@@ -6,8 +6,8 @@
 -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PPTImageElement } from '@/types/dsl'
-import { resolveElementFilters } from '@/utils/slide-style'
+import type { PPTImageElement } from '#/types/dsl'
+import { resolveElementFilters } from '#/utils/slide-style'
 
 const props = defineProps<{ element: PPTImageElement }>()
 

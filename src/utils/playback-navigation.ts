@@ -10,7 +10,7 @@
  * 说明：Phase 3 的手动翻页只影响「展示中的场景」（引擎播放进度仍由引擎游标管理），
  * 后续 Phase 7/8 再对接引擎的 jumpToAction / 讨论恢复语义。
  */
-import type { Scene } from '@/types/stage'
+import type { Scene } from '#/types/stage'
 
 /**
  * 获取相邻场景 id。

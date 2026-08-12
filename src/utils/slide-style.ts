@@ -13,7 +13,7 @@ import type {
   SlideBackground,
   PPTElementShadow,
   ImageElementFilters,
-} from '@/types/dsl'
+} from '#/types/dsl'
 
 /**
  * 幻灯片背景 → CSS 样式。

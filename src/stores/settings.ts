@@ -16,7 +16,7 @@
  * 让照搬代码里 `useSettingsStore.getState()` 零改动可用。
  */
 import { defineStore } from 'pinia'
-import type { TTSEnablementConfig } from '@/core/audio/provider-enablement'
+import type { TTSEnablementConfig } from '#/core/audio/provider-enablement'
 
 /** settings store 状态 */
 interface SettingsState {

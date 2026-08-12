@@ -9,8 +9,8 @@
   写入 settings store（引擎/AudioPlayer 实时生效）。
 -->
 <script setup lang="ts">
-import { useSettingsStore } from '@/stores/settings'
-import type { EngineMode } from '@/core/playback/types'
+import { useSettingsStore } from '#/stores/settings'
+import type { EngineMode } from '#/core/playback/types'
 
 defineProps<{
   mode: EngineMode

@@ -6,8 +6,8 @@
 -->
 <script setup lang="ts">
 import { computed, type CSSProperties } from 'vue'
-import type { PPTTextElement } from '@/types/dsl'
-import { resolveElementShadow } from '@/utils/slide-style'
+import type { PPTTextElement } from '#/types/dsl'
+import { resolveElementShadow } from '#/utils/slide-style'
 
 const props = defineProps<{ element: PPTTextElement }>()
 

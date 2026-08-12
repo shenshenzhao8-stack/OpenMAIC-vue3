@@ -8,7 +8,7 @@
  *   spanX = max(start[0], end[0])，spanY = max(start[1], end[1])（line 的
  *   minX=left、maxX=left+max(...)，差值即 max(...)）。
  */
-import type { PPTLineElement } from '@/types/dsl'
+import type { PPTLineElement } from '#/types/dsl'
 
 /** 生成线条 SVG path 的 d 属性 */
 export function getLineElementPath(element: PPTLineElement): string {

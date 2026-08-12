@@ -5,7 +5,7 @@
   点击行为与原项目一致：调用 stage store 的 setCurrentSceneId（翻页唯一入口）。
 -->
 <script setup lang="ts">
-import { useStageStore } from '@/stores/stage'
+import { useStageStore } from '#/stores/stage'
 
 const stageStore = useStageStore()
 

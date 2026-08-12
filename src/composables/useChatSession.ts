@@ -12,13 +12,13 @@
  *   - 打断/恢复讲课由 ClassroomPage 协调（engine.interrupt / endDiscussion）。
  */
 import { ref, computed } from 'vue'
-import { useStageStore } from '@/stores/stage'
-import { useCanvasStore } from '@/stores/canvas'
-import { runAgentLoop, type AgentLoopStoreState } from '@/core/chat/agent-loop'
-import { StreamBuffer } from '@/core/buffer/stream-buffer'
-import { chatStream } from '@/api/client'
-import type { DirectorState } from '@/types/chat'
-import { useDiscussionTTS } from '@/composables/useDiscussionTTS'
+import { useStageStore } from '#/stores/stage'
+import { useCanvasStore } from '#/stores/canvas'
+import { runAgentLoop, type AgentLoopStoreState } from '#/core/chat/agent-loop'
+import { StreamBuffer } from '#/core/buffer/stream-buffer'
+import { chatStream } from '#/api/client'
+import type { DirectorState } from '#/types/chat'
+import { useDiscussionTTS } from '#/composables/useDiscussionTTS'
 
 /** 聊天消息（简化：文本消息） */
 export interface ChatMessage {

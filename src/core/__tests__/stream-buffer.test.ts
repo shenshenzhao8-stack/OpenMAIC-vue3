@@ -9,7 +9,7 @@
  *   - done 事件后 waitUntilDrained() 完成（循环据此收尾）。
  */
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { StreamBuffer } from '@/core/buffer/stream-buffer'
+import { StreamBuffer } from '#/core/buffer/stream-buffer'
 
 describe('StreamBuffer（打字机队列）', () => {
   afterEach(() => {

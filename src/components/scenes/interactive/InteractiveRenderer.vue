@@ -9,9 +9,9 @@
 -->
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import type { Scene } from '@/types/stage'
-import { useInteractiveIframePool } from '@/stores/interactive-iframe-pool'
-import { patchHtmlForIframe } from '@/utils/iframe'
+import type { Scene } from '#/types/stage'
+import { useInteractiveIframePool } from '#/stores/interactive-iframe-pool'
+import { patchHtmlForIframe } from '#/utils/iframe'
 
 const props = defineProps<{ scene: Scene | null }>()
 const pool = useInteractiveIframePool()

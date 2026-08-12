@@ -19,10 +19,10 @@
  *   - resetPlaybackVisualState()      重置播放视觉状态（跳转前调用）
  *   - dispose()                       清理定时器
  */
-import type { Action, SpotlightAction, LaserAction, SpeechAction } from '@/types/action'
-import type { AudioPlayer } from '@/core/audio/audio-player'
-import { useCanvasStore } from '@/stores/canvas'
-import { EFFECT_AUTO_CLEAR_MS } from '@/core/choreography'
+import type { Action, SpotlightAction, LaserAction, SpeechAction } from '#/types/action'
+import type { AudioPlayer } from '#/core/audio/audio-player'
+import { useCanvasStore } from '#/stores/canvas'
+import { EFFECT_AUTO_CLEAR_MS } from '#/core/choreography'
 
 /** 动作执行选项 */
 export interface ActionExecutionOptions {

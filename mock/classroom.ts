@@ -9,8 +9,8 @@
  *   - slide 元素：仅 text / shape / line / image（已移除 latex 元素示例）。
  *
  */
-import type { Scene, Stage } from '@/types/stage'
-import type { Action } from '@/types/action'
+import type { Scene, Stage } from '#/types/stage'
+import type { Action } from '#/types/action'
 
 /** 示例课程 id（课堂页路由 /classroom/demo 使用） */
 export const MOCK_CLASSROOM_ID = 'demo'

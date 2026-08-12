@@ -9,8 +9,8 @@
  *   - 根据 onIterationEnd 的结果（cue_user）正确终止循环。
  */
 import { describe, it, expect } from 'vitest'
-import { runAgentLoop, type AgentLoopStoreState } from '@/core/chat/agent-loop'
-import type { StatelessEvent } from '@/types/chat'
+import { runAgentLoop, type AgentLoopStoreState } from '#/core/chat/agent-loop'
+import type { StatelessEvent } from '#/types/chat'
 
 /** 构造一个 SSE 格式的 ReadableStream（模拟后端 /api/chat 响应体） */
 function sseResponse(events: StatelessEvent[]): Response {

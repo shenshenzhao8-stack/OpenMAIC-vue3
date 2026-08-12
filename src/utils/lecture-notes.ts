@@ -18,7 +18,7 @@
  *     （play_video / discussion / widget_*）随动作裁剪一并移除，
  *     若将来恢复动作，需同步加回对应类型。
  */
-import type { Scene } from '@/types/stage'
+import type { Scene } from '#/types/stage'
 
 /** 参与讲义的动作类型（本项目仅三种教学动作） */
 const LECTURE_NOTE_ACTION_TYPES = new Set(['speech', 'spotlight', 'laser'])

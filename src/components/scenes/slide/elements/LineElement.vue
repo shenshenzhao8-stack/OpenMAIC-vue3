@@ -9,9 +9,9 @@
 -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PPTLineElement } from '@/types/dsl'
-import { getLineElementPath } from '@/utils/line-path'
-import { resolveElementShadow } from '@/utils/slide-style'
+import type { PPTLineElement } from '#/types/dsl'
+import { getLineElementPath } from '#/utils/line-path'
+import { resolveElementShadow } from '#/utils/slide-style'
 
 const props = defineProps<{ element: PPTLineElement }>()
 

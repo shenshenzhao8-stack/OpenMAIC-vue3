@@ -11,9 +11,9 @@
 -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { Scene } from '@/types/stage'
-import { useViewportSize } from '@/composables/useViewportSize'
-import { useSlideBackgroundStyle } from '@/composables/useSlideBackgroundStyle'
+import type { Scene } from '#/types/stage'
+import { useViewportSize } from '#/composables/useViewportSize'
+import { useSlideBackgroundStyle } from '#/composables/useSlideBackgroundStyle'
 import ScreenElement from './ScreenElement.vue'
 import SpotlightOverlay from './SpotlightOverlay.vue'
 import LaserOverlay from './LaserOverlay.vue'

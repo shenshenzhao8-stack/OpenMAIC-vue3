@@ -11,7 +11,7 @@ import {
   isPermissionDeniedError,
   getMicrophoneErrorType,
   requestMicrophoneAccess,
-} from '@/utils/speech-recognition'
+} from '#/utils/speech-recognition'
 
 afterEach(() => {
   vi.unstubAllGlobals()

@@ -10,7 +10,7 @@
  * ★ 每轮唯一 messageId：对齐原项目 director-graph.ts 的 `assistant-${agentId}-${Date.now()}`；
  * 固定 id 会导致前端多轮时按 id 定位消息命中旧气泡（2026-08-12 问题修复记录）。
  */
-import type { StatelessEvent } from '@/types/chat'
+import type { StatelessEvent } from '#/types/chat'
 
 /** 把一段文本按固定字符数切块（模拟网络分片到达） */
 function chunkText(text: string, size: number): string[] {

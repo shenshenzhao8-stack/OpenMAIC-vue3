@@ -6,7 +6,7 @@
 -->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { listClassrooms, type ClassroomSummary } from '@/api/client'
+import { listClassrooms, type ClassroomSummary } from '#/api/client'
 
 // 课堂列表（mock 数据，加载中为空）
 const classrooms = ref<ClassroomSummary[]>([])

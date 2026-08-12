@@ -14,7 +14,7 @@
  * 切换说明：真实后端就绪后，仅需把本文件内各函数改为 fetch 真实地址，
  * 业务代码（页面/组件）零改动。
  */
-import type { Stage, Scene } from '@/types/stage'
+import type { Stage, Scene } from '#/types/stage'
 import { mockClassroomStage, mockClassroomScenes, mockClassroomsSummary } from '../../mock/classroom'
 import { createMockChatResponse } from './mock/chat-sse'
 

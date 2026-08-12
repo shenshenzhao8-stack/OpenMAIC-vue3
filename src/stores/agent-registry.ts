@@ -11,7 +11,7 @@
  * 本项目裁剪为纯内存 store（老师固定存在，无需持久化），字段保持原样。
  */
 import { defineStore } from 'pinia'
-import type { AgentConfig } from '@/types/agent'
+import type { AgentConfig } from '#/types/agent'
 
 /** 默认老师：与课堂讲解/回答使用同一角色配置 */
 const DEFAULT_TEACHER: AgentConfig = {

@@ -7,7 +7,7 @@
  * 复盘页仅需要：选择题显示对错、简答题显示参考答案。
  * 因此只保留「用户答案是否等于正确答案」的比较，不计算得分、不产生评语。
  */
-import type { QuizQuestion } from '@/types/stage'
+import type { QuizQuestion } from '#/types/stage'
 
 /** 把单值/数组归一化为数组（多选答案顺序无关比较用） */
 function toArray(v: string | string[] | undefined): string[] {
