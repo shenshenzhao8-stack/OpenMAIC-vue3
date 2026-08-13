@@ -11,23 +11,23 @@
  * 按需可再补回。
  */
 /** Agent 角色 */
-export type AgentRole = 'teacher' | 'assistant' | 'student'
+export type AgentRole = 'teacher' | 'assistant' | 'student';
 
 /** Agent 配置（对应原项目 AgentConfig 核心字段） */
 export interface AgentConfig {
-  id: string
-  name: string
-  role: AgentRole
+  id: string;
+  name: string;
+  role: AgentRole;
   /** 人设：LLM 生成回复时的角色依据 */
-  persona: string
-  avatar: string
-  color: string
+  persona: string;
+  avatar: string;
+  color: string;
   /** 该 agent 允许执行的动作白名单（服务端还会按场景二次过滤） */
-  allowedActions: string[]
+  allowedActions: string[];
   /** 发言优先级（老师最高） */
-  priority: number
+  priority: number;
   /** 是否为内置默认 agent */
-  isDefault?: boolean
-  createdAt?: Date
-  updatedAt?: Date
+  isDefault?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

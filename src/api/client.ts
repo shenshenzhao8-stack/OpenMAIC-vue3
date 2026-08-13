@@ -14,27 +14,28 @@
  * 切换说明：真实后端就绪后，仅需把本文件内各函数改为 fetch 真实地址，
  * 业务代码（页面/组件）零改动。
  */
-import type { Stage, Scene } from '#/types/stage'
-import { mockClassroomStage, mockClassroomScenes, mockClassroomsSummary } from '../../mock/classroom'
-import { createMockChatResponse } from './mock/chat-sse'
+import type { Scene, Stage } from '#/types/stage';
+
+import { mockClassroomScenes, mockClassroomsSummary, mockClassroomStage } from '../../mock/classroom';
+import { createMockChatResponse } from './mock/chat-sse';
 
 /** 课堂列表项（首页入口展示用） */
 export interface ClassroomSummary {
-  id: string
-  name: string
-  description: string
-  scenesCount: number
+  id: string;
+  name: string;
+  description: string;
+  scenesCount: number;
 }
 
 /** 课堂加载结果：课程元信息 + 全部场景（剧本） */
 export interface ClassroomData {
-  stage: Stage
-  scenes: Scene[]
+  stage: Stage;
+  scenes: Scene[];
 }
 
 /** 课堂列表（mock：返回示例课程） */
 export async function listClassrooms(): Promise<ClassroomSummary[]> {
-  return mockClassroomsSummary.map((item) => ({ ...item }))
+  return mockClassroomsSummary.map((item) => ({ ...item }));
 }
 
 /**
@@ -46,26 +47,23 @@ export async function listClassrooms(): Promise<ClassroomSummary[]> {
  */
 export async function getClassroom(id: string): Promise<ClassroomData> {
   if (id !== mockClassroomStage.id) {
-    throw new Error(`课堂不存在：${id}（mock 阶段仅提供 "${mockClassroomStage.id}"）`)
+    throw new Error(`课堂不存在：${id}（mock 阶段仅提供 "${mockClassroomStage.id}"）`);
   }
   // 浅拷贝场景与动作（避免页面改动污染 mock 源数据）
   const scenes: Scene[] = mockClassroomScenes.map((scene) => ({
     ...scene,
     actions: scene.actions?.map((action) => ({ ...action })),
-  }))
+  }));
   return {
     stage: { ...mockClassroomStage },
     scenes,
-  }
+  };
 }
 
 /**
  * 聊天 SSE：发送完整上下文，返回 SSE 事件流（agent-loop 直接消费）。
  * mock：返回固定回答（见 mock/chat-sse.ts）。
  */
-export async function chatStream(
-  body: Record<string, unknown>,
-  signal: AbortSignal,
-): Promise<Response> {
-  return createMockChatResponse(body, signal)
+export async function chatStream(body: Record<string, unknown>, signal: AbortSignal): Promise<Response> {
+  return createMockChatResponse(body, signal);
 }

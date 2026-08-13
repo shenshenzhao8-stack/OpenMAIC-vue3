@@ -15,8 +15,8 @@
  * 无此声明时，`import Xxx from './Xxx.vue'` 会报「找不到模块」。
  */
 declare module '*.vue' {
-  import type { DefineComponent } from 'vue'
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const component: DefineComponent<Record<string, never>, Record<string, never>, any>
-  export default component
+  import type { DefineComponent } from 'vue';
+
+  const component: DefineComponent<Record<string, never>, Record<string, never>, any>;
+  export default component;
 }

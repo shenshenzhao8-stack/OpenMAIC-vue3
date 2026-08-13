@@ -9,7 +9,7 @@
  *   - findElementGeometry：按场景与元素 id 查找并计算百分比几何；
  *   - findNearestCorner：返回距元素中心最近的画布角落（0-100）。
  */
-import type { PPTElement, PercentageGeometry } from '#/types/dsl'
+import type { PercentageGeometry, PPTElement } from '#/types/dsl';
 
 /**
  * 计算元素的百分比几何（0-100 坐标系）。
@@ -22,28 +22,23 @@ export function getElementPercentageGeometry(
   viewportSize: number = 1000,
 ): PercentageGeometry | null {
   // 只有具备位置信息的元素（line 除外）才有 left/top/width/height
-  if (
-    !('left' in element) ||
-    !('top' in element) ||
-    !('width' in element) ||
-    !('height' in element)
-  ) {
-    return null
+  if (!('left' in element) || !('top' in element) || !('width' in element) || !('height' in element)) {
+    return null;
   }
 
-  const { left, top, width, height } = element
+  const { left, top, width, height } = element;
 
   // 转百分比（横向按 viewportSize，纵向按 16:9 高度）
-  const x = (left / viewportSize) * 100
-  const y = (top / (viewportSize * 0.5625)) * 100
-  const w = (width / viewportSize) * 100
-  const h = (height / (viewportSize * 0.5625)) * 100
+  const x = (left / viewportSize) * 100;
+  const y = (top / (viewportSize * 0.5625)) * 100;
+  const w = (width / viewportSize) * 100;
+  const h = (height / (viewportSize * 0.5625)) * 100;
 
   // 中心点
-  const centerX = x + w / 2
-  const centerY = y + h / 2
+  const centerX = x + w / 2;
+  const centerY = y + h / 2;
 
-  return { x, y, w, h, centerX, centerY }
+  return { x, y, w, h, centerX, centerY };
 }
 
 /**
@@ -53,29 +48,28 @@ export function getElementPercentageGeometry(
  * @param viewportSize 画布逻辑宽（默认 1000）
  */
 export function findElementGeometry(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scene: Record<string, any>,
   elementId: string,
   viewportSize: number = 1000,
 ): PercentageGeometry | null {
-  let elements: PPTElement[] | undefined
+  let elements: PPTElement[] | undefined;
 
   if (scene.type === 'slide') {
     if (scene.elements) {
       // 旧格式
-      elements = scene.elements
+      elements = scene.elements;
     } else if (scene.content?.canvas?.elements) {
       // 新格式
-      elements = scene.content.canvas.elements
+      elements = scene.content.canvas.elements;
     }
   }
 
-  if (!elements) return null
+  if (!elements) return null;
 
-  const element = elements.find((el) => el.id === elementId)
-  if (!element) return null
+  const element = elements.find((el) => el.id === elementId);
+  if (!element) return null;
 
-  return getElementPercentageGeometry(element, viewportSize)
+  return getElementPercentageGeometry(element, viewportSize);
 }
 
 /**
@@ -83,10 +77,10 @@ export function findElementGeometry(
  * 激光笔「从最近角落飞入」用。
  */
 export function findNearestCorner(geometry: PercentageGeometry): {
-  x: number
-  y: number
+  x: number;
+  y: number;
 } {
-  const { centerX, centerY } = geometry
+  const { centerX, centerY } = geometry;
 
   // 四个角落
   const corners = [
@@ -94,19 +88,19 @@ export function findNearestCorner(geometry: PercentageGeometry): {
     { x: 100, y: 0 }, // 右上
     { x: 0, y: 100 }, // 左下
     { x: 100, y: 100 }, // 右下
-  ]
+  ];
 
   // 计算距离，取最近角落
-  let minDistance = Infinity
-  let nearestCorner = corners[0]
+  let minDistance = Infinity;
+  let nearestCorner = corners[0];
 
   for (const corner of corners) {
-    const distance = Math.sqrt(Math.pow(corner.x - centerX, 2) + Math.pow(corner.y - centerY, 2))
+    const distance = Math.sqrt((corner.x - centerX) ** 2 + (corner.y - centerY) ** 2);
     if (distance < minDistance) {
-      minDistance = distance
-      nearestCorner = corner
+      minDistance = distance;
+      nearestCorner = corner;
     }
   }
 
-  return nearestCorner
+  return nearestCorner;
 }

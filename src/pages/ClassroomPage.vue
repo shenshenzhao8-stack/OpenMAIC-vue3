@@ -11,17 +11,18 @@
       （全部迁移到 src/components/classroom/index.vue）；
     - 独立应用的 /classroom/:id 路由行为保持不变。
 -->
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import OpenMaicClassroom from '#/components/classroom/index.vue'
-
-const route = useRoute()
-
-/** 路由参数 id → classroomId prop（保持独立路由可用） */
-const classroomId = computed(() => String(route.params.id))
-</script>
 
 <template>
-  <OpenMaicClassroom :classroom-id="classroomId" />
+  <open-maic-classroom :classroom-id="classroomId" />
 </template>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+
+import OpenMaicClassroom from '#/components/classroom/index.vue';
+
+const route = useRoute();
+
+/** 路由参数 id → classroomId prop（保持独立路由可用） */
+const classroomId = computed(() => String(route.params.id));
+</script>

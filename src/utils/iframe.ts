@@ -34,7 +34,7 @@ const STORAGE_SHIM = `<script data-iframe-storage-shim>
     }
   });
 })();
-</script>`
+</script>`;
 
 /**
  * 错误捕获垫片：把 iframe 内的运行错误（window.onerror / unhandledrejection /
@@ -85,7 +85,7 @@ const ERROR_CAPTURE_SHIM = `<script data-iframe-error-shim>
     }
   } catch (e) {}
 })();
-</script>`
+</script>`;
 
 /** iframe 内样式补丁：撑满宽高、允许纵向滚动、body 最小高度 */
 const IFRAME_CSS = `<style data-iframe-patch>
@@ -103,7 +103,7 @@ const IFRAME_CSS = `<style data-iframe-patch>
   }
   /* 修复 min-h-screen：iframe 中 100vh 就是 iframe 高度，但要保证 body 填满 */
   body { min-height: 100vh; }
-</style>`
+</style>`;
 
 /**
  * 给交互 HTML 打补丁（注入错误捕获 + 存储垫片 + 样式）。
@@ -111,25 +111,25 @@ const IFRAME_CSS = `<style data-iframe-patch>
  * 保证垫片先于页面自身脚本执行。
  */
 export function patchHtmlForIframe(html: string): string {
-  const injection = '\n' + ERROR_CAPTURE_SHIM + '\n' + STORAGE_SHIM + '\n' + IFRAME_CSS
+  const injection = `\n${ERROR_CAPTURE_SHIM}\n${STORAGE_SHIM}\n${IFRAME_CSS}`;
 
   // 插到 <head> 之后
-  const headIdx = html.indexOf('<head>')
+  const headIdx = html.indexOf('<head>');
   if (headIdx !== -1) {
-    const insertPos = headIdx + 6
-    return html.substring(0, insertPos) + injection + html.substring(insertPos)
+    const insertPos = headIdx + 6;
+    return html.substring(0, insertPos) + injection + html.substring(insertPos);
   }
 
   // 带属性的 <head ...> 之后
-  const headWithAttrs = html.indexOf('<head ')
+  const headWithAttrs = html.indexOf('<head ');
   if (headWithAttrs !== -1) {
-    const closeAngle = html.indexOf('>', headWithAttrs)
+    const closeAngle = html.indexOf('>', headWithAttrs);
     if (closeAngle !== -1) {
-      const insertPos = closeAngle + 1
-      return html.substring(0, insertPos) + injection + html.substring(insertPos)
+      const insertPos = closeAngle + 1;
+      return html.substring(0, insertPos) + injection + html.substring(insertPos);
     }
   }
 
   // 兜底：前插
-  return injection + html
+  return injection + html;
 }

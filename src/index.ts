@@ -9,5 +9,5 @@
  *     保证「导入包入口不会创建应用、安装 Router 或挂载 #app」；
  *   - 首期由目标 Web 的 Vite 直接编译 workspace 源码（不建设 ESM/CJS 双产物）。
  */
-export { default as OpenMaicClassroom } from './components/classroom/index.vue'
-export type { ClassroomData, OpenMaicClassroomProps } from './types/public'
+export { default as OpenMaicClassroom } from './components/classroom/index.vue';
+export type { ClassroomData, OpenMaicClassroomProps } from './types/public';

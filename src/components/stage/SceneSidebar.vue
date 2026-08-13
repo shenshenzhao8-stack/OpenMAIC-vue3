@@ -4,18 +4,6 @@
   功能：展示全部场景列表（序号 + 类型标签 + 标题），点击切换当前场景。
   点击行为与原项目一致：调用 stage store 的 setCurrentSceneId（翻页唯一入口）。
 -->
-<script setup lang="ts">
-import { useStageStore } from '#/stores/stage'
-
-const stageStore = useStageStore()
-
-/** 场景类型中文标签（展示用） */
-const sceneTypeLabel: Record<string, string> = {
-  slide: '幻灯片',
-  quiz: '测验',
-  interactive: '交互',
-}
-</script>
 
 <template>
   <aside class="scene-sidebar">
@@ -34,7 +22,18 @@ const sceneTypeLabel: Record<string, string> = {
     </ul>
   </aside>
 </template>
+<script setup lang="ts">
+import { useStageStore } from '#/stores/stage';
 
+const stageStore = useStageStore();
+
+/** 场景类型中文标签（展示用） */
+const sceneTypeLabel: Record<string, string> = {
+  slide: '幻灯片',
+  quiz: '测验',
+  interactive: '交互',
+};
+</script>
 <style scoped>
 .scene-sidebar {
   width: 220px;
@@ -44,16 +43,19 @@ const sceneTypeLabel: Record<string, string> = {
   padding: 0.75rem;
   overflow-y: auto;
 }
+
 .title {
   font-size: 0.8rem;
   color: #64748b;
   margin: 0 0 0.5rem;
 }
+
 ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
+
 li {
   display: flex;
   align-items: center;
@@ -63,13 +65,16 @@ li {
   cursor: pointer;
   margin-bottom: 0.3rem;
 }
+
 li:hover {
   background: #f1f5f9;
 }
+
 li.active {
   background: #eff6ff;
   outline: 1px solid #bfdbfe;
 }
+
 .index {
   width: 1.1rem;
   height: 1.1rem;
@@ -83,10 +88,12 @@ li.active {
   justify-content: center;
   flex-shrink: 0;
 }
+
 li.active .index {
   background: #2563eb;
   color: #fff;
 }
+
 .tag {
   font-size: 0.7rem;
   background: #e2e8f0;
@@ -94,6 +101,7 @@ li.active .index {
   padding: 0 0.3rem;
   flex-shrink: 0;
 }
+
 .scene-title {
   font-size: 0.85rem;
   color: #334155;

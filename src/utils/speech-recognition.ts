@@ -17,25 +17,20 @@
  */
 /** 浏览器是否支持语音识别（Web Speech API） */
 export function isSpeechRecognitionSupported(): boolean {
-  if (typeof window === 'undefined') return false
-  return 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
+  if (typeof window === 'undefined') return false;
+  return 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
 }
 
 /** 是否为「麦克风权限被拒绝」类错误（not-allowed / service-not-allowed） */
 export function isPermissionDeniedError(error: string): boolean {
-  return error === 'not-allowed' || error === 'service-not-allowed'
+  return error === 'not-allowed' || error === 'service-not-allowed';
 }
 
 /**
  * 麦克风错误类型：供 UI 区分「无设备 / 权限被拒 / 其他」三种情况，
  * 避免把无麦克风或环境受限误报成「权限被拒绝」。
  */
-export type MicrophoneErrorType =
-  | 'no-device'
-  | 'denied'
-  | 'insecure-context'
-  | 'unsupported'
-  | 'other'
+export type MicrophoneErrorType = 'no-device' | 'denied' | 'insecure-context' | 'unsupported' | 'other';
 
 /**
  * 把 getUserMedia 的异常分类为 MicrophoneErrorType。
@@ -43,14 +38,14 @@ export type MicrophoneErrorType =
  * 无设备错误码是 NotFoundError / DevicesNotFoundError。
  */
 export function getMicrophoneErrorType(error: unknown): MicrophoneErrorType {
-  const name = error instanceof DOMException ? error.name : (error as { name?: string } | null)?.name
-  if (name === 'NotFoundError' || name === 'DevicesNotFoundError') return 'no-device'
-  if (name === 'NotAllowedError' || name === 'PermissionDeniedError') return 'denied'
-  if (name === 'SecurityError') return 'insecure-context'
+  const name = error instanceof DOMException ? error.name : (error as { name?: string } | null)?.name;
+  if (name === 'NotFoundError' || name === 'DevicesNotFoundError') return 'no-device';
+  if (name === 'NotAllowedError' || name === 'PermissionDeniedError') return 'denied';
+  if (name === 'SecurityError') return 'insecure-context';
   // mediaDevices 缺失或 getUserMedia 不存在时，可能是受限浏览器/非安全上下文，
   // 单独归类便于提示「环境不支持」而非让用户去查系统权限
-  if (name === 'NotSupportedError' || name === 'TypeError') return 'unsupported'
-  return 'other'
+  if (name === 'NotSupportedError' || name === 'TypeError') return 'unsupported';
+  return 'other';
 }
 
 /**
@@ -63,7 +58,7 @@ export function getMicrophoneErrorType(error: unknown): MicrophoneErrorType {
  */
 export async function requestMicrophoneAccess(): Promise<MediaStream> {
   if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-    throw new DOMException('当前环境不支持麦克风访问', 'NotSupportedError')
+    throw new DOMException('当前环境不支持麦克风访问', 'NotSupportedError');
   }
-  return navigator.mediaDevices.getUserMedia({ audio: true })
+  return navigator.mediaDevices.getUserMedia({ audio: true });
 }

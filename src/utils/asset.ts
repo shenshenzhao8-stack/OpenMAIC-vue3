@@ -18,9 +18,9 @@
  */
 export function resolveAssetUrl(path: string, assetBaseUrl = ''): string {
   // 完整 URL / blob / data URI 原样返回
-  if (/^(?:https?:|blob:|data:)/.test(path)) return path
+  if (/^(?:https?:|blob:|data:)/.test(path)) return path;
   // 去掉开头的斜杠，去掉 base 结尾的斜杠，再拼接
-  const normalizedPath = path.replace(/^\/+/, '')
-  const normalizedBase = assetBaseUrl.replace(/\/+$/, '')
-  return normalizedBase ? `${normalizedBase}/${normalizedPath}` : `/${normalizedPath}`
+  const normalizedPath = path.replace(/^\/+/, '');
+  const normalizedBase = assetBaseUrl.replace(/\/+$/, '');
+  return normalizedBase ? `${normalizedBase}/${normalizedPath}` : `/${normalizedPath}`;
 }

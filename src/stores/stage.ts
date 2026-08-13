@@ -14,15 +14,16 @@
  * （setScenes / setCurrentSceneId / updateScene / setMode ...）保持一致，
  * 供后续场景渲染器与播放引擎接线使用。
  */
-import { defineStore } from 'pinia'
-import type { Scene, Stage, StageMode } from '#/types/stage'
+import { defineStore } from 'pinia';
+
+import type { Scene, Stage, StageMode } from '#/types/stage';
 
 /** stage store 状态 */
 interface StageState {
-  stage: Stage | null
-  scenes: Scene[]
-  currentSceneId: string | null
-  mode: StageMode
+  stage: Stage | null;
+  scenes: Scene[];
+  currentSceneId: string | null;
+  mode: StageMode;
 }
 
 export const useStageStore = defineStore('openmaic-stage', {
@@ -35,23 +36,23 @@ export const useStageStore = defineStore('openmaic-stage', {
   getters: {
     /** 当前场景（按 currentSceneId 查找；没有则返回 null） */
     currentScene(state): Scene | null {
-      if (!state.currentSceneId) return null
-      return state.scenes.find((s) => s.id === state.currentSceneId) ?? null
+      if (!state.currentSceneId) return null;
+      return state.scenes.find((s) => s.id === state.currentSceneId) ?? null;
     },
   },
   actions: {
     setStage(stage: Stage) {
-      this.stage = stage
+      this.stage = stage;
     },
     setScenes(scenes: Scene[]) {
-      this.scenes = scenes
+      this.scenes = scenes;
     },
     /** 设置当前页（翻页的唯一入口，后续播放引擎/侧边栏都调它） */
     setCurrentSceneId(sceneId: string | null) {
-      this.currentSceneId = sceneId
+      this.currentSceneId = sceneId;
     },
     setMode(mode: StageMode) {
-      this.mode = mode
+      this.mode = mode;
     },
     /**
      * 更新某个场景（合并 Partial 字段）。
@@ -59,21 +60,21 @@ export const useStageStore = defineStore('openmaic-stage', {
      * 信息，因此这里显式断言为 Scene —— 调用方需保证不混用 type/content。
      */
     updateScene(sceneId: string, updates: Partial<Scene>) {
-      const index = this.scenes.findIndex((s) => s.id === sceneId)
+      const index = this.scenes.findIndex((s) => s.id === sceneId);
       if (index >= 0) {
-        this.scenes[index] = { ...this.scenes[index], ...updates } as Scene
+        this.scenes[index] = { ...this.scenes[index], ...updates } as Scene;
       }
     },
     /** 按 id 查找场景 */
     getSceneById(sceneId: string): Scene | null {
-      return this.scenes.find((s) => s.id === sceneId) ?? null
+      return this.scenes.find((s) => s.id === sceneId) ?? null;
     },
     /** 清空舞台（切换课程时调用） */
     clearStore() {
-      this.stage = null
-      this.scenes = []
-      this.currentSceneId = null
-      this.mode = 'playback'
+      this.stage = null;
+      this.scenes = [];
+      this.currentSceneId = null;
+      this.mode = 'playback';
     },
   },
-})
+});

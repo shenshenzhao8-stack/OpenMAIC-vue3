@@ -18,10 +18,10 @@
  *     （play_video / discussion / widget_*）随动作裁剪一并移除，
  *     若将来恢复动作，需同步加回对应类型。
  */
-import type { Scene } from '#/types/stage'
+import type { Scene } from '#/types/stage';
 
 /** 参与讲义的动作类型（本项目仅三种教学动作） */
-const LECTURE_NOTE_ACTION_TYPES = new Set(['speech', 'spotlight', 'laser'])
+const LECTURE_NOTE_ACTION_TYPES = new Set(['speech', 'spotlight', 'laser']);
 
 /**
  * 讲义条目：要么是一条 speech 文本，要么是一个动作徽章。
@@ -29,28 +29,28 @@ const LECTURE_NOTE_ACTION_TYPES = new Set(['speech', 'spotlight', 'laser'])
  */
 export type LectureNoteItem =
   | {
-      kind: 'speech'
-      text: string
-      actionIndex: number
-      actionId: string
-      actionType: string
+      kind: 'speech';
+      text: string;
+      actionIndex: number;
+      actionId: string;
+      actionType: string;
     }
   | {
-      kind: 'action'
-      type: string
-      label?: string
-      actionIndex: number
-      actionId: string
-      actionType: string
-    }
+      kind: 'action';
+      type: string;
+      label?: string;
+      actionIndex: number;
+      actionId: string;
+      actionType: string;
+    };
 
 /** 一个场景的讲义分组（对齐原项目 lib/types/chat.ts） */
 export interface LectureNoteEntry {
-  sceneId: string
-  sceneTitle: string
-  sceneOrder: number
-  items: LectureNoteItem[]
-  completedAt: number
+  sceneId: string;
+  sceneTitle: string;
+  sceneOrder: number;
+  items: LectureNoteItem[];
+  completedAt: number;
 }
 
 /**
@@ -67,30 +67,31 @@ export function buildLectureNotes(scenes: readonly Scene[]): LectureNoteEntry[] 
       sceneTitle: scene.title,
       sceneOrder: scene.order,
       items: scene
+        // eslint-disable-next-line antfu/consistent-chaining -- 保持 prettier 单行链式格式
         .actions!.map((action, actionIndex): LectureNoteItem | null => {
-          if (!LECTURE_NOTE_ACTION_TYPES.has(action.type)) return null
+          if (!LECTURE_NOTE_ACTION_TYPES.has(action.type)) return null;
           const base = {
             actionIndex,
             actionId: action.id,
             actionType: action.type,
-          }
+          };
           if (action.type === 'speech') {
             return {
               ...base,
               kind: 'speech',
               text: action.text,
-            }
+            };
           }
           return {
             ...base,
             kind: 'action',
             type: action.type,
-          }
+          };
         })
         .filter((item): item is LectureNoteItem => item !== null),
       completedAt: scene.updatedAt || scene.createdAt || 0,
     }))
-    .sort((a, b) => a.sceneOrder - b.sceneOrder)
+    .sort((a, b) => a.sceneOrder - b.sceneOrder);
 }
 
 /**
@@ -98,7 +99,7 @@ export function buildLectureNotes(scenes: readonly Scene[]): LectureNoteEntry[] 
  * 参数：action 类型；返回：中文徽章文本（未知类型返回空串，UI 不显示徽章）。
  */
 export function getLectureActionLabel(type: string): string {
-  if (type === 'spotlight') return '聚光'
-  if (type === 'laser') return '激光'
-  return ''
+  if (type === 'spotlight') return '聚光';
+  if (type === 'laser') return '激光';
+  return '';
 }

@@ -9,19 +9,19 @@
  *   - 前缀格式：`[模块名] 消息`。
  */
 export interface Logger {
-  debug(message: string, ...args: unknown[]): void
-  info(message: string, ...args: unknown[]): void
-  warn(message: string, ...args: unknown[]): void
-  error(message: string, ...args: unknown[]): void
+  debug: (message: string, ...args: unknown[]) => void;
+  info: (message: string, ...args: unknown[]) => void;
+  warn: (message: string, ...args: unknown[]) => void;
+  error: (message: string, ...args: unknown[]) => void;
 }
 
 /** 创建一个带模块前缀的 logger */
 export function createLogger(module: string): Logger {
-  const prefix = `[${module}]`
+  const prefix = `[${module}]`;
   return {
     debug: (message, ...args) => console.debug(prefix, message, ...args),
     info: (message, ...args) => console.info(prefix, message, ...args),
     warn: (message, ...args) => console.warn(prefix, message, ...args),
     error: (message, ...args) => console.error(prefix, message, ...args),
-  }
+  };
 }

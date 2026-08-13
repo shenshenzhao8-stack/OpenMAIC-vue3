@@ -5,74 +5,7 @@
   流程：not_started（封面）→ answering（答题）→ reviewing（复盘）。
   复盘规则：选择题仅显示对错（✓/✗）；简答题显示参考答案。
 -->
-<script setup lang="ts">
-import { ref, computed, watch, inject } from 'vue'
-import type { Scene, QuizQuestion } from '#/types/stage'
-import SingleChoiceQuestion from './SingleChoiceQuestion.vue'
-import MultipleChoiceQuestion from './MultipleChoiceQuestion.vue'
-import ShortAnswerQuestion from './ShortAnswerQuestion.vue'
-import { isChoiceCorrect, isQuestionAnswered } from '#/utils/quiz-check'
-
-const props = defineProps<{ scene: Scene | null }>()
-/** 课堂 id（由 OpenMaicClassroom provide 注入，用于草稿 key 命名空间） */
-const classroomId = inject<string>('openmaicClassroomId', '')
-
-const questions = computed<QuizQuestion[]>(() =>
-  props.scene?.type === 'quiz' ? props.scene.content.questions : [],
-)
-
-/** 页面相位：封面 → 答题 → 复盘（无判分相位） */
-const phase = ref<'not_started' | 'answering' | 'reviewing'>('not_started')
-const answers = ref<Record<string, string | string[]>>({})
-
-// 本地草稿（localStorage，按「课堂 + 场景」命名空间存；MONOREPO Phase 4）
-const draftKey = computed(() =>
-  props.scene?.id && classroomId
-    ? `openmaic:${classroomId}:quiz:${props.scene.id}`
-    : '',
-)
-watch(draftKey, () => {
-  if (!draftKey.value) return
-  try {
-    const raw = localStorage.getItem(draftKey.value)
-    if (raw) answers.value = JSON.parse(raw)
-  } catch {
-    /* 草稿损坏忽略 */
-  }
-}, { immediate: true })
-watch(answers, () => {
-  if (!draftKey.value) return
-  localStorage.setItem(draftKey.value, JSON.stringify(answers.value))
-}, { deep: true })
-
-/** 是否全部作答（提交按钮启用条件） */
-const allAnswered = computed(() =>
-  questions.value.every((q) => isQuestionAnswered(q, answers.value[q.id])),
-)
-
-/** 提交：直接进入复盘（无判分） */
-function handleSubmit() {
-  if (!allAnswered.value) return
-  phase.value = 'reviewing'
-}
-
-/** 重新挑战：清空答案回到封面 */
-function handleRetry() {
-  answers.value = {}
-  localStorage.removeItem(draftKey.value)
-  phase.value = 'not_started'
-}
-
-/** 选择题对错（复盘展示用） */
-function resultOf(q: QuizQuestion): { correct: boolean } | null {
-  if (phase.value !== 'reviewing') return null
-  return { correct: isChoiceCorrect(q, answers.value[q.id]) }
-}
-
-const answeredCount = computed(
-  () => questions.value.filter((q) => isQuestionAnswered(q, answers.value[q.id])).length,
-)
-</script>
+<!-- eslint-disable vue/no-deprecated-filter -->
 
 <template>
   <div class="quiz-view">
@@ -87,12 +20,10 @@ const answeredCount = computed(
     <section v-else-if="phase === 'answering'" class="quiz-answering">
       <header class="quiz-bar">
         <span>已答 {{ answeredCount }} / {{ questions.length }}</span>
-        <button type="button" class="primary" :disabled="!allAnswered" @click="handleSubmit">
-          提交
-        </button>
+        <button type="button" class="primary" :disabled="!allAnswered" @click="handleSubmit">提交</button>
       </header>
       <div class="question-list">
-        <SingleChoiceQuestion
+        <single-choice-question
           v-for="(q, i) in questions.filter((q) => q.type === 'single')"
           :key="q.id"
           :question="q"
@@ -100,7 +31,7 @@ const answeredCount = computed(
           :value="answers[q.id] as string | undefined"
           @change="(v: string) => (answers[q.id] = v)"
         />
-        <MultipleChoiceQuestion
+        <multiple-choice-question
           v-for="(q, i) in questions.filter((q) => q.type === 'multiple')"
           :key="q.id"
           :question="q"
@@ -108,7 +39,7 @@ const answeredCount = computed(
           :value="answers[q.id] as string[] | undefined"
           @change="(v: string[]) => (answers[q.id] = v)"
         />
-        <ShortAnswerQuestion
+        <short-answer-question
           v-for="(q, i) in questions.filter((q) => q.type === 'short_answer')"
           :key="q.id"
           :question="q"
@@ -126,7 +57,7 @@ const answeredCount = computed(
         <button type="button" @click="handleRetry">重新挑战</button>
       </header>
       <div class="question-list">
-        <SingleChoiceQuestion
+        <single-choice-question
           v-for="(q, i) in questions.filter((q) => q.type === 'single')"
           :key="q.id"
           :question="q"
@@ -135,7 +66,7 @@ const answeredCount = computed(
           :result="resultOf(q)"
           disabled
         />
-        <MultipleChoiceQuestion
+        <multiple-choice-question
           v-for="(q, i) in questions.filter((q) => q.type === 'multiple')"
           :key="q.id"
           :question="q"
@@ -144,7 +75,7 @@ const answeredCount = computed(
           :result="resultOf(q)"
           disabled
         />
-        <ShortAnswerQuestion
+        <short-answer-question
           v-for="(q, i) in questions.filter((q) => q.type === 'short_answer')"
           :key="q.id"
           :question="q"
@@ -157,7 +88,76 @@ const answeredCount = computed(
     </section>
   </div>
 </template>
+<script setup lang="ts">
+import { computed, inject, ref, watch } from 'vue';
 
+import type { QuizQuestion, Scene } from '#/types/stage';
+import { isChoiceCorrect, isQuestionAnswered } from '#/utils/quiz-check';
+
+import MultipleChoiceQuestion from './MultipleChoiceQuestion.vue';
+import ShortAnswerQuestion from './ShortAnswerQuestion.vue';
+import SingleChoiceQuestion from './SingleChoiceQuestion.vue';
+
+const props = defineProps<{ scene: Scene | null }>();
+/** 课堂 id（由 OpenMaicClassroom provide 注入，用于草稿 key 命名空间） */
+const classroomId = inject<string>('openmaicClassroomId', '');
+
+const questions = computed<QuizQuestion[]>(() => (props.scene?.type === 'quiz' ? props.scene.content.questions : []));
+
+/** 页面相位：封面 → 答题 → 复盘（无判分相位） */
+const phase = ref<'not_started' | 'answering' | 'reviewing'>('not_started');
+const answers = ref<Record<string, string | string[]>>({});
+
+// 本地草稿（localStorage，按「课堂 + 场景」命名空间存；MONOREPO Phase 4）
+const draftKey = computed(() =>
+  props.scene?.id && classroomId ? `openmaic:${classroomId}:quiz:${props.scene.id}` : '',
+);
+watch(
+  draftKey,
+  () => {
+    if (!draftKey.value) return;
+    try {
+      const raw = localStorage.getItem(draftKey.value);
+      if (raw) answers.value = JSON.parse(raw);
+    } catch {
+      /* 草稿损坏忽略 */
+    }
+  },
+  { immediate: true },
+);
+watch(
+  answers,
+  () => {
+    if (!draftKey.value) return;
+    localStorage.setItem(draftKey.value, JSON.stringify(answers.value));
+  },
+  { deep: true },
+);
+
+/** 是否全部作答（提交按钮启用条件） */
+const allAnswered = computed(() => questions.value.every((q) => isQuestionAnswered(q, answers.value[q.id])));
+
+/** 提交：直接进入复盘（无判分） */
+function handleSubmit() {
+  if (!allAnswered.value) return;
+  phase.value = 'reviewing';
+}
+
+/** 重新挑战：清空答案回到封面 */
+function handleRetry() {
+  answers.value = {};
+  localStorage.removeItem(draftKey.value);
+  phase.value = 'not_started';
+}
+
+/** 选择题对错（复盘展示用） */
+function resultOf(q: QuizQuestion): { correct: boolean } | null {
+  if (phase.value !== 'reviewing') return null;
+  return { correct: isChoiceCorrect(q, answers.value[q.id]) };
+}
+
+const answeredCount = computed(() => questions.value.filter((q) => isQuestionAnswered(q, answers.value[q.id])).length);
+</script>
 <style scoped>
 .quiz-view {
   flex: 1;
@@ -166,11 +166,13 @@ const answeredCount = computed(
   flex-direction: column;
   background: #f8fafc;
 }
+
 .quiz-cover {
   margin: auto;
   text-align: center;
   padding: 2rem;
 }
+
 .quiz-bar {
   display: flex;
   align-items: center;
@@ -181,6 +183,7 @@ const answeredCount = computed(
   font-size: 0.85rem;
   color: #475569;
 }
+
 .question-list {
   flex: 1;
   overflow-y: auto;
@@ -189,6 +192,7 @@ const answeredCount = computed(
   flex-direction: column;
   gap: 0.75rem;
 }
+
 button.primary {
   background: #2563eb;
   color: #fff;
@@ -197,10 +201,12 @@ button.primary {
   padding: 0.4rem 0.9rem;
   cursor: pointer;
 }
+
 button.primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 button {
   background: #fff;
   border: 1px solid #cbd5e1;

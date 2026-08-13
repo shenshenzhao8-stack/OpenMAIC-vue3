@@ -10,18 +10,20 @@
  * 与 vite.config.ts 保持同一套 alias：让测试里 `import '@openmaic/dsl'`
  * 也能解析到 src/types/dsl/index.ts，从而验证 alias 全链路可用。
  */
-import { fileURLToPath, URL } from 'node:url'
-import { defineConfig } from 'vitest/config'
-import vue from '@vitejs/plugin-vue'
+// URL 重命名导入：避免与 DOM 全局 URL 类型冲突（与 vite.config 一致）
+import { fileURLToPath, URL as NodeUrl } from 'node:url';
+
+import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   resolve: {
     alias: [
       // 与 vite.config 一致：正则替换需带尾部斜杠
-      { find: /^#\//, replacement: `${fileURLToPath(new URL('./src', import.meta.url))}/` },
+      { find: /^#\//, replacement: `${fileURLToPath(new NodeUrl('./src', import.meta.url))}/` },
       {
         find: '@openmaic/dsl',
-        replacement: fileURLToPath(new URL('./src/types/dsl/index.ts', import.meta.url)),
+        replacement: fileURLToPath(new NodeUrl('./src/types/dsl/index.ts', import.meta.url)),
       },
     ],
   },
@@ -30,4 +32,4 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts'],
   },
-})
+});

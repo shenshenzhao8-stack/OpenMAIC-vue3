@@ -10,7 +10,7 @@
  * 说明：Phase 3 的手动翻页只影响「展示中的场景」（引擎播放进度仍由引擎游标管理），
  * 后续 Phase 7/8 再对接引擎的 jumpToAction / 讨论恢复语义。
  */
-import type { Scene } from '#/types/stage'
+import type { Scene } from '#/types/stage';
 
 /**
  * 获取相邻场景 id。
@@ -24,17 +24,17 @@ export function getAdjacentSceneId(
   currentId: string | null,
   direction: 1 | -1,
 ): string | null {
-  if (scenes.length === 0 || !currentId) return null
-  const index = scenes.findIndex((s) => s.id === currentId)
-  if (index === -1) return null
-  const target = index + direction
-  if (target < 0 || target >= scenes.length) return null
-  return scenes[target].id
+  if (scenes.length === 0 || !currentId) return null;
+  const index = scenes.findIndex((s) => s.id === currentId);
+  if (index === -1) return null;
+  const target = index + direction;
+  if (target < 0 || target >= scenes.length) return null;
+  return scenes[target].id;
 }
 
 /** 获取第一个场景 id（进入课堂时默认显示第一页） */
 export function getFirstSceneId(scenes: readonly Scene[]): string | null {
-  return scenes[0]?.id ?? null
+  return scenes[0]?.id ?? null;
 }
 
 /**
@@ -45,10 +45,7 @@ export function getFirstSceneId(scenes: readonly Scene[]): string | null {
  *
  * @returns 含当前场景的单元素数组；当前场景不存在时返回空数组
  */
-export function getSceneForPlayback(
-  scenes: readonly Scene[],
-  currentSceneId: string | null,
-): Scene[] {
-  const scene = scenes.find((s) => s.id === currentSceneId)
-  return scene ? [scene] : []
+export function getSceneForPlayback(scenes: readonly Scene[], currentSceneId: string | null): Scene[] {
+  const scene = scenes.find((s) => s.id === currentSceneId);
+  return scene ? [scene] : [];
 }

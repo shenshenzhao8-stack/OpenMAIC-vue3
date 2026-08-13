@@ -7,53 +7,53 @@
     3. rAF 循环量自身矩形并上报 setRect（Host 按此位置覆盖 iframe）。
   真正的 iframe 由 ClassroomPage 挂载的 InteractiveIframeHost 统一渲染。
 -->
-<script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import type { Scene } from '#/types/stage'
-import { useInteractiveIframePool } from '#/stores/interactive-iframe-pool'
-import { patchHtmlForIframe } from '#/utils/iframe'
-
-const props = defineProps<{ scene: Scene | null }>()
-const pool = useInteractiveIframePool()
-
-const container = ref<HTMLElement | null>(null)
-
-/** 本占位实例的唯一 id（可见权归属；防止旧实例误释放新实例） */
-let owner = ''
-/** rAF 句柄 */
-let raf = 0
-
-/** 量自身矩形并上报；下一帧继续（跟随缩放/滚动/布局变化） */
-function measure() {
-  const node = container.value
-  if (node) {
-    const r = node.getBoundingClientRect()
-    pool.setRect(props.scene?.id ?? '', { left: r.left, top: r.top, width: r.width, height: r.height })
-  }
-  raf = requestAnimationFrame(measure)
-}
-
-onMounted(() => {
-  if (props.scene?.type !== 'interactive') return
-  owner = `owner-${Math.random().toString(36).slice(2)}`
-  // 安全补丁后再登记；有 html 用 srcdoc，否则用 url
-  const html = props.scene.content.html ? patchHtmlForIframe(props.scene.content.html) : undefined
-  pool.mount(props.scene.id, { srcDoc: html, src: html ? undefined : props.scene.content.url })
-  pool.setActive(props.scene.id)
-  pool.claim(props.scene.id, owner)
-  raf = requestAnimationFrame(measure)
-})
-
-onBeforeUnmount(() => {
-  cancelAnimationFrame(raf)
-  if (props.scene?.id) pool.release(props.scene.id, owner)
-})
-</script>
 
 <template>
   <div ref="container" class="interactive-renderer" />
 </template>
+<script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 
+import { useInteractiveIframePool } from '#/stores/interactive-iframe-pool';
+import type { Scene } from '#/types/stage';
+import { patchHtmlForIframe } from '#/utils/iframe';
+
+const props = defineProps<{ scene: Scene | null }>();
+const pool = useInteractiveIframePool();
+
+const container = ref<HTMLElement | null>(null);
+
+/** 本占位实例的唯一 id（可见权归属；防止旧实例误释放新实例） */
+let owner = '';
+/** rAF 句柄 */
+let raf = 0;
+
+/** 量自身矩形并上报；下一帧继续（跟随缩放/滚动/布局变化） */
+function measure() {
+  const node = container.value;
+  if (node) {
+    const r = node.getBoundingClientRect();
+    pool.setRect(props.scene?.id ?? '', { left: r.left, top: r.top, width: r.width, height: r.height });
+  }
+  raf = requestAnimationFrame(measure);
+}
+
+onMounted(() => {
+  if (props.scene?.type !== 'interactive') return;
+  owner = `owner-${Math.random().toString(36).slice(2)}`;
+  // 安全补丁后再登记；有 html 用 srcdoc，否则用 url
+  const html = props.scene.content.html ? patchHtmlForIframe(props.scene.content.html) : undefined;
+  pool.mount(props.scene.id, { srcDoc: html, src: html ? undefined : props.scene.content.url });
+  pool.setActive(props.scene.id);
+  pool.claim(props.scene.id, owner);
+  raf = requestAnimationFrame(measure);
+});
+
+onBeforeUnmount(() => {
+  cancelAnimationFrame(raf);
+  if (props.scene?.id) pool.release(props.scene.id, owner);
+});
+</script>
 <style scoped>
 .interactive-renderer {
   width: 100%;

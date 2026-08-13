@@ -1,3 +1,4 @@
+export * from './cursor';
 /**
  * 文件头：choreography 模块出口（裁剪版）
  *
@@ -8,5 +9,4 @@
  *   - timing.ts：时序常量 + 朗读时长估算；
  *   - cursor.ts：播放游标解析。
  */
-export * from './timing'
-export * from './cursor'
+export * from './timing';

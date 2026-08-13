@@ -137,11 +137,14 @@
    ```bash
    rsync -a --delete \
      --exclude node_modules --exclude dist --exclude .git --exclude .DS_Store \
+     --exclude .gitignore \
      /Users/mac/Documents/DesktopOrganizer/project/ai-learning-practice-web/package-openmaic/ \
      /Users/mac/OpenMAIC-vue3/
    ```
 
    `--delete` 使镜像精确对齐真源（真源中已删除的文件不会残留在镜像）；
+   `.gitignore` 为各仓库本地配置、**不同步**（例：monorepo 内 `docs/` 被忽略不提交，
+   但备份镜像的 docs 仍正常跟踪）；
 3. 镜像的 git 提交由用户自行决定（遵循规则五，Codex 不代提交）；镜像仅用于备份跟踪，
    不作为开发真源；
 4. 同步动作与结果记录在当期 MONOREPO-PHASE 文档或变更记录中。

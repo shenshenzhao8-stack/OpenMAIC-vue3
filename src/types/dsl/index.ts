@@ -10,8 +10,8 @@
  */
 
 // 动作类型与常量（对应原项目 action.ts）
-export * from './action'
+export * from './action';
 // 幻灯片数据模型（对应原项目 slides.ts）
-export * from './slides'
+export * from './slides';
 // 课程骨架与守卫（对应原项目 stage.ts）
-export * from './stage'
+export * from './stage';

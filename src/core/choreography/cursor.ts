@@ -11,7 +11,7 @@
  *
  * 纯函数：不修改入参，由调用方采用返回的游标。
  */
-import type { Action, SceneCore } from '@openmaic/dsl'
+import type { Action, SceneCore } from '@openmaic/dsl';
 
 /**
  * 无动作场景的合成停留拍：空文本 speech。
@@ -22,16 +22,16 @@ export const EMPTY_SCENE_DWELL: Action = {
   id: '__empty_scene_dwell__',
   type: 'speech',
   text: '',
-} as Action
+} as Action;
 
 /** 游标解析结果 */
 export interface CursorResult {
-  action: Action
-  sceneId: string
+  action: Action;
+  sceneId: string;
   /** 引擎应采用（可能已推进）的场景游标 */
-  sceneIndex: number
+  sceneIndex: number;
   /** 引擎应采用（可能已推进）的动作游标 */
-  actionIndex: number
+  actionIndex: number;
 }
 
 /**
@@ -47,10 +47,10 @@ export function resolvePlaybackCursor(
   sceneIndex: number,
   actionIndex: number,
 ): CursorResult | null {
-  let si = sceneIndex
-  let ai = actionIndex
+  let si = sceneIndex;
+  let ai = actionIndex;
   while (si < scenes.length) {
-    const actions = scenes[si].actions ?? []
+    const actions = scenes[si].actions ?? [];
     if (actions.length === 0) {
       if (ai === 0) {
         return {
@@ -58,17 +58,17 @@ export function resolvePlaybackCursor(
           sceneId: scenes[si].id,
           sceneIndex: si,
           actionIndex: ai,
-        }
+        };
       }
-      si++
-      ai = 0
-      continue
+      si++;
+      ai = 0;
+      continue;
     }
     if (ai < actions.length) {
-      return { action: actions[ai], sceneId: scenes[si].id, sceneIndex: si, actionIndex: ai }
+      return { action: actions[ai], sceneId: scenes[si].id, sceneIndex: si, actionIndex: ai };
     }
-    si++
-    ai = 0
+    si++;
+    ai = 0;
   }
-  return null
+  return null;
 }

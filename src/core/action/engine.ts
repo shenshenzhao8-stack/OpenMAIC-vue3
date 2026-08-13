@@ -19,15 +19,15 @@
  *   - resetPlaybackVisualState()      重置播放视觉状态（跳转前调用）
  *   - dispose()                       清理定时器
  */
-import type { Action, SpotlightAction, LaserAction, SpeechAction } from '#/types/action'
-import type { AudioPlayer } from '#/core/audio/audio-player'
-import { useCanvasStore } from '#/stores/canvas'
-import { EFFECT_AUTO_CLEAR_MS } from '#/core/choreography'
+import type { AudioPlayer } from '#/core/audio/audio-player';
+import { EFFECT_AUTO_CLEAR_MS } from '#/core/choreography';
+import { useCanvasStore } from '#/stores/canvas';
+import type { Action, LaserAction, SpeechAction, SpotlightAction } from '#/types/action';
 
 /** 动作执行选项 */
 export interface ActionExecutionOptions {
   /** 静默模式：跳转/重放时使用，speech/spotlight/laser 等不产生实际效果 */
-  silent?: boolean
+  silent?: boolean;
 }
 
 /**
@@ -37,19 +37,19 @@ export interface ActionExecutionOptions {
  */
 export class ActionEngine {
   /** 音频播放器（可空：无音频时 speech 直接完成） */
-  private audioPlayer: AudioPlayer | null
+  private audioPlayer: AudioPlayer | null;
   /** 特效自动清除定时器（聚光/激光 5 秒后熄灭） */
-  private effectTimer: ReturnType<typeof setTimeout> | null = null
+  private effectTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(audioPlayer?: AudioPlayer | null) {
-    this.audioPlayer = audioPlayer ?? null
+    this.audioPlayer = audioPlayer ?? null;
   }
 
   /** 清理定时器（组件卸载时调用，防止内存泄漏） */
   dispose(): void {
     if (this.effectTimer) {
-      clearTimeout(this.effectTimer)
-      this.effectTimer = null
+      clearTimeout(this.effectTimer);
+      this.effectTimer = null;
     }
   }
 
@@ -63,32 +63,31 @@ export class ActionEngine {
     // 静默模式：speech / spotlight / laser 直接跳过（用于跳转时的前缀重放）
     if (options.silent) {
       if (action.type === 'speech' || action.type === 'spotlight' || action.type === 'laser') {
-        return
+        return;
       }
     }
 
     switch (action.type) {
       case 'spotlight':
-        this.executeSpotlight(action)
-        return
+        this.executeSpotlight(action);
+        return;
       case 'laser':
-        this.executeLaser(action)
-        return
+        this.executeLaser(action);
+        return;
       case 'speech':
-        return this.executeSpeech(action)
+        return this.executeSpeech(action);
       default:
-        // 裁剪范围外的动作（白板 / 视频 / widget / discussion）：不做任何事
-        return
+      // 裁剪范围外的动作（白板 / 视频 / widget / discussion）：不做任何事
     }
   }
 
   /** 清除全部视觉特效（聚光/激光），并取消待执行的自动清除定时器 */
   clearEffects(): void {
     if (this.effectTimer) {
-      clearTimeout(this.effectTimer)
-      this.effectTimer = null
+      clearTimeout(this.effectTimer);
+      this.effectTimer = null;
     }
-    useCanvasStore.getState().clearAllEffects()
+    useCanvasStore.getState().clearAllEffects();
   }
 
   /**
@@ -96,10 +95,10 @@ export class ActionEngine {
    * 原项目还会清空白板，本项目无白板，故仅清除特效、暂停视频、关闭白板标记。
    */
   resetPlaybackVisualState(): void {
-    this.clearEffects()
-    useCanvasStore.getState().pauseVideo()
-    useCanvasStore.getState().setWhiteboardOpen(false)
-    useCanvasStore.getState().setWhiteboardClearing(false)
+    this.clearEffects();
+    useCanvasStore.getState().pauseVideo();
+    useCanvasStore.getState().setWhiteboardOpen(false);
+    useCanvasStore.getState().setWhiteboardClearing(false);
   }
 
   /**
@@ -109,12 +108,12 @@ export class ActionEngine {
    */
   private scheduleEffectClear(): void {
     if (this.effectTimer) {
-      clearTimeout(this.effectTimer)
+      clearTimeout(this.effectTimer);
     }
     this.effectTimer = setTimeout(() => {
-      useCanvasStore.getState().clearAllEffects()
-      this.effectTimer = null
-    }, EFFECT_AUTO_CLEAR_MS)
+      useCanvasStore.getState().clearAllEffects();
+      this.effectTimer = null;
+    }, EFFECT_AUTO_CLEAR_MS);
   }
 
   // ==================== 火速动作 ====================
@@ -123,16 +122,16 @@ export class ActionEngine {
   private executeSpotlight(action: SpotlightAction): void {
     useCanvasStore.getState().setSpotlight(action.elementId, {
       dimness: action.dimOpacity ?? 0.5,
-    })
-    this.scheduleEffectClear()
+    });
+    this.scheduleEffectClear();
   }
 
   /** 执行激光笔：把「目标元素 id + 颜色」写入 canvas store，LaserOverlay 自动响应 */
   private executeLaser(action: LaserAction): void {
     useCanvasStore.getState().setLaser(action.elementId, {
       color: action.color ?? '#ff0000',
-    })
-    this.scheduleEffectClear()
+    });
+    this.scheduleEffectClear();
   }
 
   // ==================== 同步动作 ====================
@@ -143,14 +142,14 @@ export class ActionEngine {
    * 播放引擎据此执行下一条动作 —— 这是「语音文字同步」的执行端。
    */
   private async executeSpeech(action: SpeechAction): Promise<void> {
-    if (!this.audioPlayer) return
+    if (!this.audioPlayer) return;
     return new Promise<void>((resolve) => {
-      this.audioPlayer!.onEnded(() => resolve())
+      this.audioPlayer!.onEnded(() => resolve());
       this.audioPlayer!.play(action.audioId || '', action.audioUrl)
         .then((audioStarted) => {
-          if (!audioStarted) resolve()
+          if (!audioStarted) resolve();
         })
-        .catch(() => resolve())
-    })
+        .catch(() => resolve());
+    });
   }
 }
